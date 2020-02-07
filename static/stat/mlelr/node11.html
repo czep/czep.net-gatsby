@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Newton-Raphson</TITLE>
+<META NAME="description" CONTENT="Newton-Raphson">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html136"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html134"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html130"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html137"
+  HREF="node12.html">Implementation</A>
+<B> Up:</B> <A NAME="tex2html135"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html131"
+  HREF="node10.html">Parameter Estimation</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00022300000000000000">
+Newton-Raphson</A>
+</H3>
+To illustrate the iterative procedure of Newton-Raphson as it applies to the multinomial logistic regression model, we need an expression for Eq.&nbsp;<A HREF="node6.html#eq:NR-1">20</A>.  Let <!-- MATH
+ $\boldsymbol{\mu}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img82.png"
+ ALT="$ \boldsymbol{\mu}$"> be a matrix with <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> rows and <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$"> columns, the same dimensions as <!-- MATH
+ $\boldsymbol{y}$
+ -->
+<IMG
+ WIDTH="15" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img12.png"
+ ALT="$ \boldsymbol{y}$"> and <!-- MATH
+ $\boldsymbol{\pi}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img14.png"
+ ALT="$ \boldsymbol{\pi}$">, with elements equal to <!-- MATH
+ $n_i \pi_{ij}$
+ -->
+<IMG
+ WIDTH="42" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img147.png"
+ ALT="$ n_i \pi_{ij}$">.  Then, Eq.&nbsp;<A HREF="node6.html#eq:first-deriv-mx">21</A> expresses a matrix with <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> rows and <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$"> columns, the same dimensions as <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$">.  By matrix multiplication, the elements of this matrix are equivalent to those derived in Eq.&nbsp;<A HREF="node10.html#eq:multinomial-first-deriv">32</A>.
+
+<P>
+The expression for the matrix of second partial derivatives is somewhat different from that derived in the binomial case, since the equations in Eq.&nbsp;<A HREF="node10.html#eq:multinomial-2nd-deriv-complete">37</A> differ depending on whether or not <!-- MATH
+ $j^\prime = j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img133.png"
+ ALT="$ j^\prime = j$">.
+
+<P>
+For the diagonal elements of the matrix of second partial derivatives, i.e., where <!-- MATH
+ $j^\prime = j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img133.png"
+ ALT="$ j^\prime = j$">, let <!-- MATH
+ $\boldsymbol{W}$
+ -->
+<IMG
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img88.png"
+ ALT="$ \boldsymbol{W}$"> be a square matrix of order <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$">, with elements <!-- MATH
+ $n_i\pi_{ij}(1-\pi_{ij})$
+ -->
+<IMG
+ WIDTH="107" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img148.png"
+ ALT="$ n_i\pi_{ij}(1-\pi_{ij})$"> on the diagonal and zeros everywhere else.  Then, Eq.&nbsp;<A HREF="node6.html#eq:2nd-deriv-mx">22</A> generates a <!-- MATH
+ $K+1 \times K+1$
+ -->
+<IMG
+ WIDTH="118" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img91.png"
+ ALT="$ K+1 \times K+1$"> matrix.  However, we can only use this formulation for the diagonal elements.  For the off-diagonal elements, where <!-- MATH
+ $j^\prime \neq j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img142.png"
+ ALT="$ j^\prime \neq j$">, define <!-- MATH
+ $\boldsymbol{W}$
+ -->
+<IMG
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img88.png"
+ ALT="$ \boldsymbol{W}$"> as a diagonal matrix with elements <!-- MATH
+ $n_i\pi_{ij}\pi_{ik}$
+ -->
+<IMG
+ WIDTH="64" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img149.png"
+ ALT="$ n_i\pi_{ij}\pi_{ik}$">, and use the <I>negative</I> of the expression in Eq.&nbsp;<A HREF="node6.html#eq:2nd-deriv-mx">22</A>.
+
+<P>
+Using this dual formulation for <!-- MATH
+ $\boldsymbol{W}$
+ -->
+<IMG
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img88.png"
+ ALT="$ \boldsymbol{W}$">, each step of the Newton-Raphson method can proceed as in the binomial logistic regression model, using Eq.&nbsp;<A HREF="node6.html#eq:NR-2">23</A>.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html136"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html134"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html130"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html137"
+  HREF="node12.html">Implementation</A>
+<B> Up:</B> <A NAME="tex2html135"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html131"
+  HREF="node10.html">Parameter Estimation</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

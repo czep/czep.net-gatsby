@@ -1,0 +1,60 @@
+"""Analyze the complete works of William Shakespeare.
+
+Download and extract the bard's complete works from:
+http://www.it.usyd.edu.au/~matty/Shakespeare/
+
+Copy this script into its root directory and run.
+This script will produce a frequency distribution of
+the unique characters in Shakespeare's corpus, treating
+consecutive whitespace as one.
+"""
+
+import os
+import string
+
+def readfile(fn):
+    inf = open(fn)
+    text = inf.read()
+    inf.close()
+    return text
+
+class TextStat:
+    def __init__(self):
+        self._numfiles = 0
+        self._numchars = 0
+        self._chardict = {' ': 0}
+    def parsefile(self, fn):
+        ws = False
+        for c in readfile(fn):
+            if c in string.printable:
+                if c in string.whitespace:
+                    if ws == False:
+                        self._chardict[' '] += 1
+                        self._numchars += 1
+                        ws = True
+                else:
+                    ws = False
+                    self._numchars += 1
+                    if c in self._chardict:
+                        self._chardict[c] += 1
+                    else:
+                        self._chardict[c] = 1
+        self._numfiles += 1
+    def __str__(self):
+        s = str(self._numchars) + " characters in " +str(self._numfiles) + " files.\n"
+        s += str(len(self._chardict)) + " unique characters.\nFrequency distribution:\n"
+        for k in sorted(self._chardict.keys()):
+            s += str(k) + "\t" + str(self._chardict[k]) + "\n"
+        return s
+    
+
+if __name__ == "__main__":
+    T = TextStat()
+    for base, dirs, files in os.walk(os.getcwd()):
+        if base != os.getcwd():
+            for f in files:
+                T.parsefile(os.path.join(base, f))
+
+    print T
+
+### EOF ###

@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Model</TITLE>
+<META NAME="description" CONTENT="The Model">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="next" HREF="node5.html">
+<LINK REL="previous" HREF="node3.html">
+<LINK REL="up" HREF="node3.html">
+<LINK REL="next" HREF="node5.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html69"
+  HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html67"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html61"
+  HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html70"
+  HREF="node5.html">Parameter Estimation</A>
+<B> Up:</B> <A NAME="tex2html68"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html62"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00021100000000000000">
+The Model</A>
+</H3>
+Consider a random variable <IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.png"
+ ALT="$ Z$"> that can take on one of two possible values.  Given a dataset with a total sample size of <IMG
+ WIDTH="23" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img3.png"
+ ALT="$ M$">, where each observation is independent, <!-- MATH
+ $\boldsymbol{Z}$
+ -->
+<IMG
+ WIDTH="19" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img4.png"
+ ALT="$ \boldsymbol{Z}$"> can be considered as a column vector of <IMG
+ WIDTH="23" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img3.png"
+ ALT="$ M$"> binomial random variables <IMG
+ WIDTH="22" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img5.png"
+ ALT="$ {Z_i}$">.  By convention, a value of 1 is used to indicate ``success'' and a value of either 0 or 2 (but not both) is used to signify ``failure.''  To simplify computational details of estimation, it is convenient to aggregate the data such that each row represents one distinct combination of values of the independent variables.  These rows are often referred to as ``populations.''  Let <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> represent the total number of populations and let <!-- MATH
+ $\boldsymbol{n}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.png"
+ ALT="$ \boldsymbol{n}$"> be a column vector with elements <IMG
+ WIDTH="20" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img7.png"
+ ALT="$ {n_i}$"> representing the number of observations in population <IMG
+ WIDTH="10" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img8.png"
+ ALT="$ i$"> for <IMG
+ WIDTH="10" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img8.png"
+ ALT="$ i$"> = 1 to <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> where <!-- MATH
+ ${\sum_{i=1}^{N} n_i = M}$
+ -->
+<IMG
+ WIDTH="106" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img9.png"
+ ALT="$ {\sum_{i=1}^{N} n_i = M}$">, the total sample size.
+
+<P>
+Now, let <!-- MATH
+ $\boldsymbol{Y}$
+ -->
+<IMG
+ WIDTH="21" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img10.png"
+ ALT="$ \boldsymbol{Y}$"> be a column vector of length <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> where each element <IMG
+ WIDTH="20" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img11.png"
+ ALT="$ {Y_i}$"> is a random variable representing the number of successes of <IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.png"
+ ALT="$ Z$"> for population <IMG
+ WIDTH="10" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img8.png"
+ ALT="$ i$">.  Let the column vector <!-- MATH
+ $\boldsymbol{y}$
+ -->
+<IMG
+ WIDTH="15" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img12.png"
+ ALT="$ \boldsymbol{y}$"> contain elements <IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img13.png"
+ ALT="$ {y_i}$"> representing the observed counts of the number of successes for each population.  Let <!-- MATH
+ $\boldsymbol{\pi}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img14.png"
+ ALT="$ \boldsymbol{\pi}$"> be a column vector also of length <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> with elements <IMG
+ WIDTH="20" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img15.png"
+ ALT="$ {\pi_i}$"> = <!-- MATH
+ $P(Z_i=1|i)$
+ -->
+<IMG
+ WIDTH="92" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img16.png"
+ ALT="$ P(Z_i=1\vert i)$">, i.e., the probability of success for any given observation in the <IMG
+ WIDTH="24" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img17.png"
+ ALT="$ i^{th}$"> population.
+
+<P>
+The linear component of the model contains the design matrix and the vector of parameters to be estimated.  The design matrix of independent variables, <!-- MATH
+ $\boldsymbol{X}$
+ -->
+<IMG
+ WIDTH="22" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img18.png"
+ ALT="$ \boldsymbol{X}$">, is composed of <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> rows and <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> columns, where <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$ K$"> is the number of independent variables specified in the model.  For each row of the design matrix, the first element <!-- MATH
+ $x_{i0} = 1$
+ -->
+<IMG
+ WIDTH="58" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$ x_{i0} = 1$">. This is the intercept or the ``alpha.''  The parameter vector, <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$">, is a column vector of length <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$">.  There is one parameter corresponding to each of the <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$ K$"> columns of independent variable settings in <!-- MATH
+ $\boldsymbol{X}$
+ -->
+<IMG
+ WIDTH="22" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img18.png"
+ ALT="$ \boldsymbol{X}$">, plus one, <IMG
+ WIDTH="22" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img23.png"
+ ALT="$ {\beta_0}$">, for the intercept.
+
+<P>
+The logistic regression model equates the <I>logit</I> transform, the log-odds of the probability of a success, to the linear component:
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-logit-model"></A><!-- MATH
+ \begin{equation}
+\log \displaystyle\biggl(\frac{\pi_i}{1-\pi_i}\biggr) = \sum_{k=0}^{K} x_{ik}\beta_k \qquad  i = 1, 2, \ldots, N
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="338" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img24.png"
+ ALT="$\displaystyle \log \displaystyle\biggl(\frac{\pi_i}{1-\pi_i}\biggr) = \sum_{k=0}^{K} x_{ik}\beta_k \qquad i = 1, 2, \ldots, N$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(1)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html69"
+  HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html67"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html61"
+  HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html70"
+  HREF="node5.html">Parameter Estimation</A>
+<B> Up:</B> <A NAME="tex2html68"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html62"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

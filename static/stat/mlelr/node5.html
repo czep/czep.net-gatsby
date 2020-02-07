@@ -1,0 +1,671 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Parameter Estimation</TITLE>
+<META NAME="description" CONTENT="Parameter Estimation">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="next" HREF="node6.html">
+<LINK REL="previous" HREF="node4.html">
+<LINK REL="up" HREF="node3.html">
+<LINK REL="next" HREF="node6.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html79"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html77"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html71"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html80"
+  HREF="node6.html">The Newton-Raphson Method</A>
+<B> Up:</B> <A NAME="tex2html78"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html72"
+  HREF="node4.html">The Model</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00021200000000000000">
+Parameter Estimation</A>
+</H3>
+The goal of logistic regression is to estimate the <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> unknown parameters <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> in Eq.&nbsp;<A HREF="node4.html#eq:binomial-logit-model">1</A>.  This is done with maximum likelihood estimation which entails finding the set of parameters for which the probability of the observed data is greatest.  The maximum likelihood equation is derived from the probability distribution of the dependent variable.  Since each <IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img13.png"
+ ALT="$ {y_i}$"> represents a binomial count in the <IMG
+ WIDTH="24" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img17.png"
+ ALT="$ i^{th}$"> population, the joint probability density function of <!-- MATH
+ $\boldsymbol{Y}$
+ -->
+<IMG
+ WIDTH="21" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img10.png"
+ ALT="$ \boldsymbol{Y}$"> is:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-pdf"></A><!-- MATH
+ \begin{equation}
+f(\boldsymbol{y}|\boldsymbol{\beta}) = \prod_{i=1}^N \frac{n_i!}{y_i!(n_i-y_i)!} \pi_i^{y_i}(1-\pi_i)^{n_i-y_i}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="315" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img25.png"
+ ALT="$\displaystyle f(\boldsymbol{y}\vert\boldsymbol{\beta}) = \prod_{i=1}^N \frac{n_i!}{y_i!(n_i-y_i)!} \pi_i^{y_i}(1-\pi_i)^{n_i-y_i}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(2)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+For each population, there are <!-- MATH
+ ${n_i\choose{y_i}}$
+ -->
+<IMG
+ WIDTH="34" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="img26.png"
+ ALT="$ {n_i\choose{y_i}}$"> different ways to arrange <IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img13.png"
+ ALT="$ {y_i}$"> successes from among <IMG
+ WIDTH="20" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img7.png"
+ ALT="$ {n_i}$"> trials.  Since the probability of a success for any one of the <IMG
+ WIDTH="20" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img7.png"
+ ALT="$ {n_i}$"> trials is <IMG
+ WIDTH="20" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img15.png"
+ ALT="$ {\pi_i}$">, the probability of <IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img13.png"
+ ALT="$ {y_i}$"> successes is <!-- MATH
+ ${\pi_{i}^{y_i}}$
+ -->
+<IMG
+ WIDTH="27" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img27.png"
+ ALT="$ {\pi_{i}^{y_i}}$">.  Likewise, the probability of <IMG
+ WIDTH="55" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img28.png"
+ ALT="$ {n_i-y_i}$"> failures is <!-- MATH
+ $(1-\pi_{i})^{n_i-y_i}$
+ -->
+<IMG
+ WIDTH="100" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img29.png"
+ ALT="$ (1-\pi_{i})^{n_i-y_i}$">.
+
+<P>
+The joint probability density function in Eq.&nbsp;<A HREF="#eq:binomial-pdf">2</A> expresses the values of <!-- MATH
+ $\boldsymbol{y}$
+ -->
+<IMG
+ WIDTH="15" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img12.png"
+ ALT="$ \boldsymbol{y}$"> as a function of known, fixed values for <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$">.  (Note that <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> is related to <!-- MATH
+ $\boldsymbol{\pi}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img14.png"
+ ALT="$ \boldsymbol{\pi}$"> by Eq.&nbsp;<A HREF="node4.html#eq:binomial-logit-model">1</A>).  The <I>likelihood</I> function has the same form as the probability density function, except that the parameters of the function are reversed:  the likelihood function expresses the values of <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> in terms of known, fixed values for <!-- MATH
+ $\boldsymbol{y}$
+ -->
+<IMG
+ WIDTH="15" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img12.png"
+ ALT="$ \boldsymbol{y}$">.  Thus,
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-likelihood-function"></A><!-- MATH
+ \begin{equation}
+L(\boldsymbol{\beta}|\boldsymbol{y}) = \prod_{i=1}^N \frac{n_i!}{y_i!(n_i-y_i)!} \pi_i^{y_i}(1-\pi_i)^{n_i-y_i}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="316" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img30.png"
+ ALT="$\displaystyle L(\boldsymbol{\beta}\vert\boldsymbol{y}) = \prod_{i=1}^N \frac{n_i!}{y_i!(n_i-y_i)!} \pi_i^{y_i}(1-\pi_i)^{n_i-y_i}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(3)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+The maximum likelihood estimates are the values for <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> that maximize the likelihood function in Eq.&nbsp;<A HREF="#eq:binomial-likelihood-function">3</A>.  The critical points of a function (maxima and minima) occur when the first derivative equals 0.  If the second derivative evaluated at that point is less than zero, then the critical point is a maximum (for more on this see a good Calculus text, such as Spivak [<A
+ HREF="node13.html#spivak">14</A>]).  Thus, finding the maximum likelihood estimates requires computing the first and second derivatives of the likelihood function.  Attempting to take the derivative of Eq.&nbsp;<A HREF="#eq:binomial-likelihood-function">3</A> with respect to <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> is a difficult task due to the complexity of multiplicative terms.  Fortunately, the likelihood equation can be considerably simplified.
+
+<P>
+First, note that the factorial terms do not contain any of the <IMG
+ WIDTH="20" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img31.png"
+ ALT="$ \pi_i$">.  As a result, they are essentially constants that can be ignored:  maximizing the equation without the factorial terms will come to the same result as if they were included.  Second, note that since <!-- MATH
+ $a^{x-y} = a^x/a^y$
+ -->
+<IMG
+ WIDTH="106" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img32.png"
+ ALT="$ a^{x-y} = a^x/a^y$">, and after rearragning terms, the equation to be maximized can be written as:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-likelihood-simpl-1"></A><!-- MATH
+ \begin{equation}
+\prod_{i=1}^N \displaystyle\biggl(\frac{\pi_i}{1-\pi_i}\biggr)^{y_i}(1-\pi_i)^{n_i}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="187" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img33.png"
+ ALT="$\displaystyle \prod_{i=1}^N \displaystyle\biggl(\frac{\pi_i}{1-\pi_i}\biggr)^{y_i}(1-\pi_i)^{n_i}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(4)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Note that after taking <IMG
+ WIDTH="12" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img34.png"
+ ALT="$ e$"> to both sides of Eq.&nbsp;<A HREF="node4.html#eq:binomial-logit-model">1</A>,
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-logit-model-2"></A><!-- MATH
+ \begin{equation}
+\displaystyle\biggl(\frac{\pi_i}{1-\pi_i}\biggr) = e^{\sum_{k=0}^{K} x_{ik}\beta_k}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="184" HEIGHT="59" ALIGN="MIDDLE" BORDER="0"
+ SRC="img35.png"
+ ALT="$\displaystyle \displaystyle\biggl(\frac{\pi_i}{1-\pi_i}\biggr) = e^{\sum_{k=0}^{K} x_{ik}\beta_k}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(5)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+which, after solving for <IMG
+ WIDTH="20" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img31.png"
+ ALT="$ \pi_i$"> becomes,
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-logit-model-3"></A><!-- MATH
+ \begin{equation}
+\pi_i = \displaystyle\biggl(\frac{e^{\sum_{k=0}^{K} x_{ik}\beta_k}}{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}}\biggr)
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="184" HEIGHT="69" ALIGN="MIDDLE" BORDER="0"
+ SRC="img36.png"
+ ALT="$\displaystyle \pi_i = \displaystyle\biggl(\frac{e^{\sum_{k=0}^{K} x_{ik}\beta_k}}{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}}\biggr)$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(6)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+Substituting Eq.&nbsp;<A HREF="#eq:binomial-logit-model-2">5</A> for the first term and Eq.&nbsp;<A HREF="#eq:binomial-logit-model-3">6</A> for the second term, Eq.&nbsp;<A HREF="#eq:binomial-likelihood-simpl-1">4</A> becomes:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-likelihood-simpl-2"></A><!-- MATH
+ \begin{equation}
+\prod_{i=1}^N (e^{\sum_{k=0}^{K} x_{ik}\beta_k})^{y_i} \displaystyle\biggl(1-\frac{e^{\sum_{k=0}^{K} x_{ik}\beta_k}}{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}}\biggr)^{n_i}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="319" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img37.png"
+ ALT="$\displaystyle \prod_{i=1}^N (e^{\sum_{k=0}^{K} x_{ik}\beta_k})^{y_i} \displayst...
+...\sum_{k=0}^{K} x_{ik}\beta_k}}{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}}\biggr)^{n_i}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(7)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Use <!-- MATH
+ $(a^x)^y=a^{xy}$
+ -->
+<IMG
+ WIDTH="91" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img38.png"
+ ALT="$ (a^x)^y=a^{xy}$"> to simplify the first product and replace 1 with <!-- MATH
+ $\frac{1+e^{\sum\boldsymbol{x}\boldsymbol{\beta}}}{1+e^{\sum\boldsymbol{x}\boldsymbol{\beta}}}$
+ -->
+<IMG
+ WIDTH="61" HEIGHT="46" ALIGN="MIDDLE" BORDER="0"
+ SRC="img39.png"
+ ALT="$ \frac{1+e^{\sum\boldsymbol{x}\boldsymbol{\beta}}}{1+e^{\sum\boldsymbol{x}\boldsymbol{\beta}}}$"> to simplify the second product.  Eq.&nbsp;<A HREF="#eq:binomial-likelihood-simpl-2">7</A> can now be written as:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-likelihood-simpl-3"></A><!-- MATH
+ \begin{equation}
+\prod_{i=1}^N (e^{y_i\sum_{k=0}^{K} x_{ik}\beta_k}) (1+e^{\sum_{k=0}^{K} x_{ik}\beta_k})^{-n_i}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="285" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img40.png"
+ ALT="$\displaystyle \prod_{i=1}^N (e^{y_i\sum_{k=0}^{K} x_{ik}\beta_k}) (1+e^{\sum_{k=0}^{K} x_{ik}\beta_k})^{-n_i}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(8)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+This is the kernel of the likelihood function to maximize.  However, it is still cumbersome to differentiate and can be simplified a great deal further by taking its log.  Since the logarithm is a monotonic function, any maximum of the likelihood function will also be a maximum of the log likelihood function and vice versa.  Thus, taking the natural log of Eq.&nbsp;<A HREF="#eq:binomial-likelihood-simpl-3">8</A> yields the log likelihood function:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:binomial-log-likelihood"></A><!-- MATH
+ \begin{equation}
+l(\boldsymbol{\beta}) = \sum_{i=1}^N y_i \biggl(\sum_{k=0}^{K} x_{ik}\beta_k\biggr) - n_i \cdot \log(1+e^{\sum_{k=0}^{K} x_{ik}\beta_k})
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="393" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img41.png"
+ ALT="$\displaystyle l(\boldsymbol{\beta}) = \sum_{i=1}^N y_i \biggl(\sum_{k=0}^{K} x_{ik}\beta_k\biggr) - n_i \cdot \log(1+e^{\sum_{k=0}^{K} x_{ik}\beta_k})$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(9)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+To find the critical points of the log likelihood function, set the first derivative with respect to each <IMG
+ WIDTH="15" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img42.png"
+ ALT="$ \beta$"> equal to zero.  In differentiating Eq.&nbsp;<A HREF="#eq:binomial-log-likelihood">9</A>, note that 
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:10"></A><!-- MATH
+ \begin{equation}
+\frac{\partial}{\partial\beta_k} \sum_{k=0}^{K} x_{ik}\beta_k = x_{ik}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="154" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img43.png"
+ ALT="$\displaystyle \frac{\partial}{\partial\beta_k} \sum_{k=0}^{K} x_{ik}\beta_k = x_{ik}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(10)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+since the other terms in the summation do not depend on <IMG
+ WIDTH="22" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img44.png"
+ ALT="$ \beta_k$"> and can thus be treated as constants.  In differentiating the second half of Eq.&nbsp;<A HREF="#eq:binomial-log-likelihood">9</A>, take note of the general rule that <!-- MATH
+ $\frac{\partial}{\partial x} \log y = \frac{1}{y}\frac{\partial y}{\partial x}$
+ -->
+<IMG
+ WIDTH="115" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img45.png"
+ ALT="$ \frac{\partial}{\partial x} \log y = \frac{1}{y}\frac{\partial y}{\partial x}$">.  Thus, differentiating Eq.&nbsp;<A HREF="#eq:binomial-log-likelihood">9</A> with respect to each <IMG
+ WIDTH="22" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img44.png"
+ ALT="$ \beta_k$">,
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:first-deriv"></A><!-- MATH
+ \begin{eqnarray}
+\frac{\partial l(\beta)}{\partial \beta_k} & = & \sum_{i=1}^N y_i x_{ik} - n_i \cdot \frac{1}{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}} \cdot \frac{\partial}{\partial \beta_k} \biggl( 1+e^{\sum_{k=0}^{K} x_{ik}\beta_k} \biggr) \nonumber \\
+& = & \sum_{i=1}^N y_i x_{ik} - n_i \cdot \frac{1}{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}} \cdot e^{\sum_{k=0}^{K} x_{ik}\beta_k} \cdot \frac{\partial}{\partial \beta_k} \sum_{k=0}^{K} x_{ik}\beta_k \nonumber \\
+& = & \sum_{i=1}^N y_i x_{ik} - n_i \cdot \frac{1}{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}} \cdot e^{\sum_{k=0}^{K} x_{ik}\beta_k} \cdot x_{ik} \nonumber \\
+& = & \sum_{i=1}^N y_i x_{ik} - n_i \pi_i x_{ik} %\\
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="48" HEIGHT="58" ALIGN="MIDDLE" BORDER="0"
+ SRC="img46.png"
+ ALT="$\displaystyle \frac{\partial l(\beta)}{\partial \beta_k}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="416" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img48.png"
+ ALT="$\displaystyle \sum_{i=1}^N y_i x_{ik} - n_i \cdot \frac{1}{1+e^{\sum_{k=0}^{K} ...
+...{\partial}{\partial \beta_k} \biggl( 1+e^{\sum_{k=0}^{K} x_{ik}\beta_k} \biggr)$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="445" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img49.png"
+ ALT="$\displaystyle \sum_{i=1}^N y_i x_{ik} - n_i \cdot \frac{1}{1+e^{\sum_{k=0}^{K} ...
+...k}\beta_k} \cdot \frac{\partial}{\partial \beta_k} \sum_{k=0}^{K} x_{ik}\beta_k$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="364" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img50.png"
+ ALT="$\displaystyle \sum_{i=1}^N y_i x_{ik} - n_i \cdot \frac{1}{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}} \cdot e^{\sum_{k=0}^{K} x_{ik}\beta_k} \cdot x_{ik}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="144" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img51.png"
+ ALT="$\displaystyle \sum_{i=1}^N y_i x_{ik} - n_i \pi_i x_{ik} %\\
+$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(11)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+The maximum likelihood estimates for <!-- MATH
+ $\boldsymbol\beta$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img52.png"
+ ALT="$ \boldsymbol\beta$"> can be found by setting each of the <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> equations in Eq.&nbsp;<A HREF="#eq:first-deriv">11</A> equal to zero and solving for each <IMG
+ WIDTH="22" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img44.png"
+ ALT="$ \beta_k$">.  Each such solution, if any exists, specifies a critical point-either a maximum or a minimum.  The critical point will be a maximum if the matrix of second partial derivatives is negative definite; that is, if every element on the diagonal of the matrix is less than zero (for a more precise definition of matrix <I>definiteness</I> see [<A
+ HREF="node13.html#golub">7</A>]).  Another useful property of this matrix is that it forms the variance-covariance matrix of the parameter estimates.  It is formed by differentiating each of the <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> equations in Eq.&nbsp;<A HREF="#eq:first-deriv">11</A> a second time with respect to each element of <IMG
+ WIDTH="15" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img42.png"
+ ALT="$ \beta$">, denoted by <!-- MATH
+ $\beta_{k^\prime}$
+ -->
+<IMG
+ WIDTH="27" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img53.png"
+ ALT="$ \beta_{k^\prime}$">.  The general form of the matrix of second partial derivatives is
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:2nd-deriv"></A><!-- MATH
+ \begin{eqnarray}
+\frac{\partial^2 l(\beta)}{\partial \beta_k \partial\beta_{k^\prime}} & = & \frac{\partial}{\partial\beta_{k^\prime}} \sum_{i=1}^N y_i x_{ik} - n_i x_{ik} \pi_i \nonumber \\
+& = & \frac{\partial}{\partial\beta_{k^\prime}} \sum_{i=1}^N - n_i x_{ik} \pi_i \nonumber \\
+& = & - \sum_{i=1}^N n_i x_{ik} \frac{\partial}{\partial\beta_{k^\prime}} \biggl(\frac{e^{\sum_{k=0}^{K} x_{ik}\beta_k}}{{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}}} \biggr)
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="69" HEIGHT="61" ALIGN="MIDDLE" BORDER="0"
+ SRC="img54.png"
+ ALT="$\displaystyle \frac{\partial^2 l(\beta)}{\partial \beta_k \partial\beta_{k^\prime}}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="184" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img55.png"
+ ALT="$\displaystyle \frac{\partial}{\partial\beta_{k^\prime}} \sum_{i=1}^N y_i x_{ik} - n_i x_{ik} \pi_i$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="139" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img56.png"
+ ALT="$\displaystyle \frac{\partial}{\partial\beta_{k^\prime}} \sum_{i=1}^N - n_i x_{ik} \pi_i$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="265" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img57.png"
+ ALT="$\displaystyle - \sum_{i=1}^N n_i x_{ik} \frac{\partial}{\partial\beta_{k^\prime...
+...e^{\sum_{k=0}^{K} x_{ik}\beta_k}}{{1+e^{\sum_{k=0}^{K} x_{ik}\beta_k}}} \biggr)$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(12)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+To solve Eq.&nbsp;<A HREF="#eq:2nd-deriv">12</A> we will make use of two general rules for differentiation.  First, a rule for differentiating exponential functions:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:exponent-rule"></A><!-- MATH
+ \begin{equation}
+\frac{\mathrm{d}}{\mathrm{d} x} e^{u(x)} = e^{u(x)} \cdot \frac{\mathrm{d}}{\mathrm{d} x} u(x)
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="190" HEIGHT="56" ALIGN="MIDDLE" BORDER="0"
+ SRC="img58.png"
+ ALT="$\displaystyle \frac{\mathrm{d}}{\mathrm{d} x} e^{u(x)} = e^{u(x)} \cdot \frac{\mathrm{d}}{\mathrm{d} x} u(x)$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(13)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+In our case, let <!-- MATH
+ $u(x) = \sum_{k=0}^{K} x_{ik}\beta_k$
+ -->
+<IMG
+ WIDTH="149" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img59.png"
+ ALT="$ u(x) = \sum_{k=0}^{K} x_{ik}\beta_k$">.  Second, the quotient rule for differentiating the quotient of two functions:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:quotient-rule"></A><!-- MATH
+ \begin{equation}
+\biggl(\frac{f}{g}\biggr)^\prime(a) = \frac{g(a) \cdot f^\prime(a) - f(a) \cdot g^\prime(a)}{[g(a)]^2}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="284" HEIGHT="63" ALIGN="MIDDLE" BORDER="0"
+ SRC="img60.png"
+ ALT="$\displaystyle \biggl(\frac{f}{g}\biggr)^\prime(a) = \frac{g(a) \cdot f^\prime(a) - f(a) \cdot g^\prime(a)}{[g(a)]^2}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(14)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Applying these two rules together allows us to solve Eq.&nbsp;<A HREF="#eq:2nd-deriv">12</A>.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:solve-2nd-deriv"></A><!-- MATH
+ \begin{eqnarray}
+\frac{\mathrm{d}}{\mathrm{d} x} \frac{e^{u(x)}}{1+e^{u(x)}} & = & \frac{(1+e^{u(x)}) \cdot e^{u(x)} \frac{\mathrm{d}}{\mathrm{d} x} u(x) - e^{u(x)} \cdot e^{u(x)} \frac{\mathrm{d}}{\mathrm{d} x} u(x)}{(1+e^{u(x)})^2} \nonumber \\& = & \frac{e^{u(x)} \frac{\mathrm{d}}{\mathrm{d} x} u(x)}{(1+e^{u(x)})^2} \nonumber \\& = & \frac{e^{u(x)}}{1+e^{u(x)}} \cdot \frac{1}{1+e^{u(x)}} \cdot \frac{\mathrm{d}}{\mathrm{d} x} u(x)
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="97" HEIGHT="64" ALIGN="MIDDLE" BORDER="0"
+ SRC="img61.png"
+ ALT="$\displaystyle \frac{\mathrm{d}}{\mathrm{d} x} \frac{e^{u(x)}}{1+e^{u(x)}}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="343" HEIGHT="66" ALIGN="MIDDLE" BORDER="0"
+ SRC="img62.png"
+ ALT="$\displaystyle \frac{(1+e^{u(x)}) \cdot e^{u(x)} \frac{\mathrm{d}}{\mathrm{d} x}...
+...- e^{u(x)} \cdot e^{u(x)} \frac{\mathrm{d}}{\mathrm{d} x} u(x)}{(1+e^{u(x)})^2}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="95" HEIGHT="66" ALIGN="MIDDLE" BORDER="0"
+ SRC="img63.png"
+ ALT="$\displaystyle \frac{e^{u(x)} \frac{\mathrm{d}}{\mathrm{d} x} u(x)}{(1+e^{u(x)})^2}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="224" HEIGHT="64" ALIGN="MIDDLE" BORDER="0"
+ SRC="img64.png"
+ ALT="$\displaystyle \frac{e^{u(x)}}{1+e^{u(x)}} \cdot \frac{1}{1+e^{u(x)}} \cdot \frac{\mathrm{d}}{\mathrm{d} x} u(x)$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(15)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+Thus, Eq.&nbsp;<A HREF="#eq:2nd-deriv">12</A> can now be written as:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:2nd-deriv-simpl"></A><!-- MATH
+ \begin{equation}
+- \sum_{i=1}^N n_i x_{ik} \pi_i(1-\pi_i)x_{ik^\prime}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="189" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img65.png"
+ ALT="$\displaystyle - \sum_{i=1}^N n_i x_{ik} \pi_i(1-\pi_i)x_{ik^\prime}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(16)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html79"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html77"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html71"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html80"
+  HREF="node6.html">The Newton-Raphson Method</A>
+<B> Up:</B> <A NAME="tex2html78"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html72"
+  HREF="node4.html">The Model</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

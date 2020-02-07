@@ -1,0 +1,161 @@
+/* main.css at czep.net - 09 Mar 2005 */
+
+body {
+    background: url(img/bg_west.gif) #fff repeat-y bottom left;
+    border: none;
+    margin: 0;
+    padding: 0;
+    font-family: "Trebuchet MS", Trebuchet, Verdana, Helvetica, sans-serif;
+}
+
+a:link {
+    font-weight: bold;
+    color: #33f;
+    text-decoration: none;
+    background: transparent;
+}
+
+a:visited {
+    font-weight: bold;
+    color: #33f;
+    text-decoration: none;
+    background: transparent;
+}
+
+a:hover {
+    font-weight: bold;
+    color: #00f;
+    text-decoration: none;
+    background: #ccf;
+}
+
+a:active {
+    font-weight: bold;
+    color: #00f;
+    text-decoration: none;
+    background: transparent;
+}
+   
+a img { border-style: none; }
+
+h1, h2, h3, h4, h5, h6 {
+    color: #006;
+    margin: 0 0 1em 0;
+    }
+
+h1 {
+    font-size: x-large;
+    font-weight: normal;
+    }
+
+h2 {    
+    font-size: large;
+    font-weight: normal;
+    }
+
+h3 {
+    font-size: medium;
+}
+
+p, ul, ol {
+    font-size: small;
+}
+    
+#one {
+    background: url(img/bg_east.gif) #fff repeat-y bottom right;
+    margin-left: 120px;
+    padding: 0;
+    border: none;
+}
+
+#two {       
+    margin-right: 120px;
+}
+
+#mainbann {
+    height: 334px;
+    background: url(img/slices2.jpg) #fff no-repeat bottom right; 
+}
+
+#timestamp {
+    text-align: right;
+    font-size: x-small;
+    background: #ccf;
+    padding: 2px;
+    border: 1px #999 solid;
+}
+
+#footer {
+    clear: both;
+    width: 100%;
+}
+
+
+/* cbox */
+ 
+.cbox            { background: url(img/corners/s1/99c/c.gif) repeat; }
+.cbox .n         { background: url(img/corners/s1/99c/n.gif) repeat-x; }
+.cbox .n div     { background: url(img/corners/s1/99c/nw.gif) no-repeat top left; }
+.cbox .n div div { background: url(img/corners/s1/99c/ne.gif) no-repeat top right; }
+.cbox .w         { background: url(img/corners/s1/99c/w.gif) repeat-y left; }
+.cbox .e         { background: url(img/corners/s1/99c/e.gif) repeat-y right; }
+.cbox .s         { background: url(img/corners/s1/99c/s.gif) repeat-x; }
+.cbox .s div     { background: url(img/corners/s1/99c/sw.gif) no-repeat top left; }
+.cbox .s div div { background: url(img/corners/s1/99c/se.gif) no-repeat top right; }
+
+/* cbox2 - for mouse over */
+.cbox2            { background: url(img/corners/s2/ccf/c.gif) repeat; }
+.cbox2 .n         { background: url(img/corners/s2/ccf/n.gif) repeat-x; }
+.cbox2 .n div     { background: url(img/corners/s2/ccf/nw.gif) no-repeat top left; }
+.cbox2 .n div div { background: url(img/corners/s2/ccf/ne.gif) no-repeat top right; }
+.cbox2 .w         { background: url(img/corners/s2/ccf/w.gif) repeat-y left; }
+.cbox2 .e         { background: url(img/corners/s2/ccf/e.gif) repeat-y right; }
+.cbox2 .s         { background: url(img/corners/s2/ccf/s.gif) repeat-x; }
+.cbox2 .s div     { background: url(img/corners/s2/ccf/sw.gif) no-repeat top left; }
+.cbox2 .s div div { background: url(img/corners/s2/ccf/se.gif) no-repeat top right; }
+
+/* cbox3 - for mouse down */
+.cbox3            { background: url(img/corners/s3/ccf/c.gif) repeat; }
+.cbox3 .n         { background: url(img/corners/s3/ccf/n.gif) repeat-x; }
+.cbox3 .n div     { background: url(img/corners/s3/ccf/nw.gif) no-repeat top left; }
+.cbox3 .n div div { background: url(img/corners/s3/ccf/ne.gif) no-repeat top right; }
+.cbox3 .w         { background: url(img/corners/s3/ccf/w.gif) repeat-y left; }
+.cbox3 .e         { background: url(img/corners/s3/ccf/e.gif) repeat-y right; }
+.cbox3 .s         { background: url(img/corners/s3/ccf/s.gif) repeat-x; }
+.cbox3 .s div     { background: url(img/corners/s3/ccf/sw.gif) no-repeat top left; }
+.cbox3 .s div div { background: url(img/corners/s3/ccf/se.gif) no-repeat top right; }
+
+.cbox .n div, .cbox .n, .cbox2 .n div, .cbox2 .n, .cbox3 .n div, .cbox3 .n   {
+    height: 20px;
+    font-size: 1px;
+}
+
+.cbox .s div, .cbox .s, .cbox2 .s div, .cbox2 .s, .cbox3 .s div, .cbox3 .s {
+    height: 26px;
+    font-size: 1px;
+}
+
+.cbox .e .content, .cbox2 .e .content {
+    margin: 0;
+    padding: 0 26px 0 16px;
+}
+
+.cbox .e .content p, .cbox2 .e .content p, .cbox3 .e .content p {
+    margin: 16px 0 0 0;
+}
+
+.cbox .e .content h2, .cbox2 .e .content h2, .cbox3 .e .content h2 {
+    margin: 0 0 15px 0;
+    padding: 0 0 4px 0;
+    border-bottom: 1px solid #000;
+}
+
+.cbox .e .content h3, .cbox2 .e .content h3, .cbox3 .e .content h3 {
+    margin: 1em 0 15px 0;
+    padding: 0 0 4px 0;
+}
+
+.cbox3 .e .content {
+    margin: 0;
+    padding: 5px 21px 0 21px;
+}

@@ -1,0 +1,289 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Model</TITLE>
+<META NAME="description" CONTENT="The Model">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="next" HREF="node10.html">
+<LINK REL="previous" HREF="node8.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node10.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html118"
+  HREF="node10.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html116"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html110"
+  HREF="node8.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html119"
+  HREF="node10.html">Parameter Estimation</A>
+<B> Up:</B> <A NAME="tex2html117"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html111"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00022100000000000000">
+The Model</A>
+</H3>
+Generalizing to a multinomial dependent variable requires us to make some notational adaptations.  Let <IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img94.png"
+ ALT="$ J$"> represent the number of discrete categories of the dependent variable, where <IMG
+ WIDTH="48" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img95.png"
+ ALT="$ J \ge 2$">.  Now, consider random variable <IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.png"
+ ALT="$ Z$"> that can take on one of <IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img94.png"
+ ALT="$ J$"> possible values.  If each observation is independent, then each <IMG
+ WIDTH="22" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img96.png"
+ ALT="$ Z_i$"> is a multinomial random variable.  Once again, we aggregate the data into populations each of which represents one unique combination of independent variable settings.  As with the binomial logistic regression model, the column vector <!-- MATH
+ $\boldsymbol{n}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.png"
+ ALT="$ \boldsymbol{n}$"> contains elements <IMG
+ WIDTH="20" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img97.png"
+ ALT="$ n_i$"> which represent the number of observations in population <IMG
+ WIDTH="10" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img8.png"
+ ALT="$ i$">, and such that <!-- MATH
+ ${\sum_{i=1}^{N} n_i = M}$
+ -->
+<IMG
+ WIDTH="106" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img9.png"
+ ALT="$ {\sum_{i=1}^{N} n_i = M}$">, the total sample size.
+
+<P>
+Since each observation records one of <IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img94.png"
+ ALT="$ J$"> possible values for the dependent variable, <IMG
+ WIDTH="18" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.png"
+ ALT="$ Z$">, let <!-- MATH
+ $\boldsymbol{y}$
+ -->
+<IMG
+ WIDTH="15" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img12.png"
+ ALT="$ \boldsymbol{y}$"> be a matrix with <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> rows (one for each population) and <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$"> columns.  Note that if <IMG
+ WIDTH="48" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img99.png"
+ ALT="$ J=2$"> this reduces to the column vector used in the binomial logistic regression model.  For each population, <IMG
+ WIDTH="25" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img100.png"
+ ALT="$ y_{ij}$"> represents the observed counts of the <IMG
+ WIDTH="26" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.png"
+ ALT="$ j^{th}$"> value of <IMG
+ WIDTH="22" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img96.png"
+ ALT="$ Z_i$">.  Similarly, <!-- MATH
+ $\boldsymbol{\pi}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img14.png"
+ ALT="$ \boldsymbol{\pi}$"> is a matrix of the same dimensions as <!-- MATH
+ $\boldsymbol{y}$
+ -->
+<IMG
+ WIDTH="15" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img12.png"
+ ALT="$ \boldsymbol{y}$"> where each element <IMG
+ WIDTH="26" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img102.png"
+ ALT="$ \pi_{ij}$"> is the probability of observing the <IMG
+ WIDTH="26" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.png"
+ ALT="$ j^{th}$"> value of the dependent variable for any given observation in the <IMG
+ WIDTH="24" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img17.png"
+ ALT="$ i^{th}$"> population.
+
+<P>
+The design matrix of independent variables, <!-- MATH
+ $\boldsymbol{X}$
+ -->
+<IMG
+ WIDTH="22" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img18.png"
+ ALT="$ \boldsymbol{X}$">, remains the same--it contains <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> rows and <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> columns where <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img20.png"
+ ALT="$ K$"> is the number of independent variables and the first element of each row, <IMG
+ WIDTH="58" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img21.png"
+ ALT="$ x_{i0} = 1$">, the intercept.  Let <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> be a matrix with <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> rows and <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$"> columns, such that each element <!-- MATH
+ $\beta_{kj}$
+ -->
+<IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img103.png"
+ ALT="$ \beta_{kj}$"> contains the parameter estimate for the <IMG
+ WIDTH="27" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img104.png"
+ ALT="$ k^{th}$"> covariate and the <IMG
+ WIDTH="26" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.png"
+ ALT="$ j^{th}$"> value of the dependent variable.
+
+<P>
+For the multinomial logistic regression model, we equate the linear component to the log of the odds of a <IMG
+ WIDTH="26" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.png"
+ ALT="$ j^{th}$"> observation compared to the <IMG
+ WIDTH="29" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img105.png"
+ ALT="$ J^{th}$"> observation.  That is, we will consider the <IMG
+ WIDTH="29" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img105.png"
+ ALT="$ J^{th}$"> category to be the omitted or baseline category, where logits of the first <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$"> categories are constructed with the baseline category in the denominator.
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-logit-model"></A><!-- MATH
+ \begin{equation}
+\log \biggl(\frac{\pi_{ij}}{\pi_{iJ}}\biggr) = \log \biggl(\frac{\pi_{ij}}{1-\sum_{j=1}^{J-1} \pi_{ij}}\biggr) = \sum_{k=0}^{K} x_{ik}\beta_{kj} \qquad  \begin{array}{c} i = 1, 2, \ldots, N \\
+j = 1, 2, \ldots, J-1 \end{array}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="541" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img106.png"
+ ALT="$\displaystyle \log \biggl(\frac{\pi_{ij}}{\pi_{iJ}}\biggr) = \log \biggl(\frac{...
+...qquad \begin{array}{c} i = 1, 2, \ldots, N \\ j = 1, 2, \ldots, J-1 \end{array}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(24)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Solving for <IMG
+ WIDTH="26" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img102.png"
+ ALT="$ \pi_{ij}$">, we have:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-logit-model-simpl-1"></A><!-- MATH
+ \begin{eqnarray}
+\pi_{ij} & = & \frac{e^{\sum_{k=0}^K x_{ik}\beta_{kj}}}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \qquad j < J \nonumber \\
+\pi_{iJ} & = & \frac{1}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="26" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img107.png"
+ ALT="$\displaystyle \pi_{ij}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="251" HEIGHT="69" ALIGN="MIDDLE" BORDER="0"
+ SRC="img108.png"
+ ALT="$\displaystyle \frac{e^{\sum_{k=0}^K x_{ik}\beta_{kj}}}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \qquad j &lt; J$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="28" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img109.png"
+ ALT="$\displaystyle \pi_{iJ}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="173" HEIGHT="56" ALIGN="MIDDLE" BORDER="0"
+ SRC="img110.png"
+ ALT="$\displaystyle \frac{1}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(25)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html118"
+  HREF="node10.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html116"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html110"
+  HREF="node8.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html119"
+  HREF="node10.html">Parameter Estimation</A>
+<B> Up:</B> <A NAME="tex2html117"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html111"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

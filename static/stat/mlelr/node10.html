@@ -1,0 +1,640 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Parameter Estimation</TITLE>
+<META NAME="description" CONTENT="Parameter Estimation">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="next" HREF="node11.html">
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node8.html">
+<LINK REL="next" HREF="node11.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html128"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html126"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html120"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html129"
+  HREF="node11.html">Newton-Raphson</A>
+<B> Up:</B> <A NAME="tex2html127"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html121"
+  HREF="node9.html">The Model</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00022200000000000000">
+Parameter Estimation</A>
+</H3>
+For each population, the dependent variable follows a multinomial distribution with <IMG
+ WIDTH="16" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img94.png"
+ ALT="$ J$"> levels.  Thus, the joint probability density function is:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-pdf"></A><!-- MATH
+ \begin{equation}
+f(\boldsymbol{y}|\boldsymbol{\beta}) = \prod_{i=1}^N \biggl[\frac{n_i!}{\prod_{j=1}^J y_{ij}!} \cdot \prod_{j=1}^J \pi_{ij}^{\phantom{ij}y_{ij}}\biggr]
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="271" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img111.png"
+ ALT="$\displaystyle f(\boldsymbol{y}\vert\boldsymbol{\beta}) = \prod_{i=1}^N \biggl[\...
+...\prod_{j=1}^J y_{ij}!} \cdot \prod_{j=1}^J \pi_{ij}^{\phantom{ij}y_{ij}}\biggr]$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(26)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+When <IMG
+ WIDTH="48" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img99.png"
+ ALT="$ J=2$">, this reduces to Eq.&nbsp;<A HREF="node5.html#eq:binomial-pdf">2</A>.  The likelihood function is algebraically equivalent to Eq.&nbsp;<A HREF="#eq:multinomial-pdf">26</A>, the only difference being that the likelihood function expresses the unknown values of <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> in terms of known fixed constant values for <!-- MATH
+ $\boldsymbol{y}$
+ -->
+<IMG
+ WIDTH="15" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img12.png"
+ ALT="$ \boldsymbol{y}$">.  Since we want to maximize Eq.&nbsp;<A HREF="#eq:multinomial-pdf">26</A> with respect to <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$">, the factorial terms that do not contain any of the <IMG
+ WIDTH="26" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img102.png"
+ ALT="$ \pi_{ij}$"> terms can be treated as constants.  Thus, the kernel of the log likelihood function for multinomial logistic regression models is:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-likelihood"></A><!-- MATH
+ \begin{equation}
+L(\boldsymbol{\beta}|\boldsymbol{y}) \simeq \prod_{i=1}^N \prod_{j=1}^J \pi_{ij}^{\phantom{ij}y_{ij}}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="172" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img112.png"
+ ALT="$\displaystyle L(\boldsymbol{\beta}\vert\boldsymbol{y}) \simeq \prod_{i=1}^N \prod_{j=1}^J \pi_{ij}^{\phantom{ij}y_{ij}}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(27)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Replacing the <IMG
+ WIDTH="29" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img105.png"
+ ALT="$ J^{th}$"> terms, Eq.&nbsp;<A HREF="#eq:multinomial-likelihood">27</A> becomes:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-likelihood-simpl-1"></A><!-- MATH
+ \begin{eqnarray}
+& & \prod_{i=1}^N \prod_{j=1}^{J-1} \pi_{ij}^{\phantom{ij}y_{ij}} \cdot \pi_{iJ}^{\phantom{iJ}n_i - \sum_{j=1}^{J-1} y_{ij}} \nonumber \\
+& = & \prod_{i=1}^N \prod_{j=1}^{J-1} \pi_{ij}^{\phantom{ij}y_{ij}} \cdot \frac{\pi_{iJ}^{\phantom{iJ}n_i}}{\pi_{iJ}^{\phantom{iJ}\sum_{j=1}^{J-1} y_{ij}}} \nonumber \\
+& = & \prod_{i=1}^N \prod_{j=1}^{J-1} \pi_{ij}^{\phantom{ij}y_{ij}} \cdot \frac{\pi_{iJ}^{\phantom{iJ}n_i}}{\prod_{j=1}^{J-1} \pi_{iJ}^{\phantom{iJ}y_{ij}}}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="215" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img113.png"
+ ALT="$\displaystyle \prod_{i=1}^N \prod_{j=1}^{J-1} \pi_{ij}^{\phantom{ij}y_{ij}} \cdot \pi_{iJ}^{\phantom{iJ}n_i - \sum_{j=1}^{J-1} y_{ij}}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="198" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img114.png"
+ ALT="$\displaystyle \prod_{i=1}^N \prod_{j=1}^{J-1} \pi_{ij}^{\phantom{ij}y_{ij}} \cd...
+...rac{\pi_{iJ}^{\phantom{iJ}n_i}}{\pi_{iJ}^{\phantom{iJ}\sum_{j=1}^{J-1} y_{ij}}}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="202" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img115.png"
+ ALT="$\displaystyle \prod_{i=1}^N \prod_{j=1}^{J-1} \pi_{ij}^{\phantom{ij}y_{ij}} \cd...
+...ac{\pi_{iJ}^{\phantom{iJ}n_i}}{\prod_{j=1}^{J-1} \pi_{iJ}^{\phantom{iJ}y_{ij}}}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(28)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+Since <!-- MATH
+ $a^{x+y}=a^xa^y$
+ -->
+<IMG
+ WIDTH="98" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="img116.png"
+ ALT="$ a^{x+y}=a^xa^y$">, the sum in the exponent in the denominator of the last term becomes a product over the first <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$"> terms of <IMG
+ WIDTH="13" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img117.png"
+ ALT="$ j$">.  Continue by grouping together the terms that are raised to the <IMG
+ WIDTH="25" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img100.png"
+ ALT="$ y_{ij}$"> power for each <IMG
+ WIDTH="13" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img117.png"
+ ALT="$ j$"> up to <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$">:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-likelihood-simpl-2"></A><!-- MATH
+ \begin{equation}
+\prod_{i=1}^N \prod_{j=1}^{J-1} \biggl( \frac{\pi_{ij}}{\pi_{iJ}} \biggr)^{y_{ij}} \cdot \pi_{iJ}^{\phantom{iJ}n_i}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="177" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img118.png"
+ ALT="$\displaystyle \prod_{i=1}^N \prod_{j=1}^{J-1} \biggl( \frac{\pi_{ij}}{\pi_{iJ}} \biggr)^{y_{ij}} \cdot \pi_{iJ}^{\phantom{iJ}n_i}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(29)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Now, substitute for <IMG
+ WIDTH="26" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img102.png"
+ ALT="$ \pi_{ij}$"> and <IMG
+ WIDTH="28" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img119.png"
+ ALT="$ \pi_{iJ}$"> using Eq.&nbsp;<A HREF="node9.html#eq:multinomial-logit-model">24</A> and Eq.&nbsp;<A HREF="node9.html#eq:multinomial-logit-model-simpl-1">25</A>:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-likelihood-simpl-3"></A><!-- MATH
+ \begin{eqnarray}
+& & \prod_{i=1}^N \prod_{j=1}^{J-1} (e^{\sum_{k=0}^{K} x_{ik}\beta_{kj}})^{y_{ij}} \cdot \biggl( \frac{1}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \biggr)^{n_i} \nonumber \\
+& = & \prod_{i=1}^N \prod_{j=1}^{J-1} e^{y_{ij}\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot \biggl(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\biggr)^{-n_i}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="395" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img120.png"
+ ALT="$\displaystyle \prod_{i=1}^N \prod_{j=1}^{J-1} (e^{\sum_{k=0}^{K} x_{ik}\beta_{k...
+...( \frac{1}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \biggr)^{n_i}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="373" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img121.png"
+ ALT="$\displaystyle \prod_{i=1}^N \prod_{j=1}^{J-1} e^{y_{ij}\sum_{k=0}^K x_{ik}\beta...
+...cdot \biggl(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\biggr)^{-n_i}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(30)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+Taking the natural log of Eq.&nbsp;<A HREF="#eq:multinomial-likelihood-simpl-3">30</A> gives us the log likelihood function for the multinomial logistic regression model:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-log-likelihood"></A><!-- MATH
+ \begin{equation}
+l(\boldsymbol{\beta}) = \sum_{i=1}^N \sum_{j=1}^{J-1} \biggl( y_{ij} \sum_{k=0}^K x_{ik}\beta_{kj} \biggr) - n_i \log \biggl(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\biggr)
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="470" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img122.png"
+ ALT="$\displaystyle l(\boldsymbol{\beta}) = \sum_{i=1}^N \sum_{j=1}^{J-1} \biggl( y_{...
+... - n_i \log \biggl(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\biggr)$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(31)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+As with the binomial model, we want to find the values for <!-- MATH
+ $\boldsymbol\beta$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img52.png"
+ ALT="$ \boldsymbol\beta$"> which maximize Eq.&nbsp;<A HREF="#eq:multinomial-log-likelihood">31</A>.  We will do this using the Newton-Raphson method, which involves calculating the first and second derivatives of the log likelihood function.  We can take the first derivatives using the steps similar to those in Eq.&nbsp;<A HREF="node5.html#eq:first-deriv">11</A>:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-first-deriv"></A><!-- MATH
+ \begin{eqnarray}
+\frac{\partial l(\beta)}{\partial \beta_{kj}} & = & \sum_{i=1}^N y_{ij} x_{ik} - n_i \cdot \frac{1}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \cdot \frac{\partial}{\partial \beta_{kj}} \biggl(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \biggr) \nonumber \\
+& = & \sum_{i=1}^N y_{ij} x_{ik} - n_i \cdot \frac{1}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \cdot e^{\sum_{k=0}^{K} x_{ik}\beta_{kj}} \cdot \frac{\partial}{\partial \beta_{kj}} \sum_{k=0}^{K} x_{ik}\beta_{kj} \nonumber \\
+& = & \sum_{i=1}^N y_{ij} x_{ik} - n_i \cdot \frac{1}{1 + \sum_{j=1}^{J-1} e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \cdot e^{\sum_{k=0}^{K} x_{ik}\beta_{kj}} \cdot x_{ik} \nonumber \\
+& = & \sum_{i=1}^N y_{ij} x_{ik} - n_i \pi_{ij} x_{ik}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="48" HEIGHT="58" ALIGN="MIDDLE" BORDER="0"
+ SRC="img123.png"
+ ALT="$\displaystyle \frac{\partial l(\beta)}{\partial \beta_{kj}}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="516" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img124.png"
+ ALT="$\displaystyle \sum_{i=1}^N y_{ij} x_{ik} - n_i \cdot \frac{1}{1 + \sum_{j=1}^{J...
+...beta_{kj}} \biggl(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \biggr)$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="522" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img125.png"
+ ALT="$\displaystyle \sum_{i=1}^N y_{ij} x_{ik} - n_i \cdot \frac{1}{1 + \sum_{j=1}^{J...
+...kj}} \cdot \frac{\partial}{\partial \beta_{kj}} \sum_{k=0}^{K} x_{ik}\beta_{kj}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="429" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img126.png"
+ ALT="$\displaystyle \sum_{i=1}^N y_{ij} x_{ik} - n_i \cdot \frac{1}{1 + \sum_{j=1}^{J...
+...=0}^K x_{ik}\beta_{kj}}} \cdot e^{\sum_{k=0}^{K} x_{ik}\beta_{kj}} \cdot x_{ik}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="157" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img127.png"
+ ALT="$\displaystyle \sum_{i=1}^N y_{ij} x_{ik} - n_i \pi_{ij} x_{ik}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(32)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+Note that there are <!-- MATH
+ $(J-1) \cdot (K+1)$
+ -->
+<IMG
+ WIDTH="131" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img128.png"
+ ALT="$ (J-1) \cdot (K+1)$"> equations in Eq.&nbsp;<A HREF="#eq:multinomial-first-deriv">32</A> which we want to set equal to zero and solve for each <!-- MATH
+ $\beta_{kj}$
+ -->
+<IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img103.png"
+ ALT="$ \beta_{kj}$">.  Although technically a matrix, we may consider <!-- MATH
+ $\boldsymbol\beta$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img52.png"
+ ALT="$ \boldsymbol\beta$"> to be a column vector, by appending each of the additional columns below the first.  In this way, we can form the matrix of second partial derivatives as a square matrix of order <!-- MATH
+ $(J-1) \cdot (K+1)$
+ -->
+<IMG
+ WIDTH="131" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img128.png"
+ ALT="$ (J-1) \cdot (K+1)$">.  For each <!-- MATH
+ $\beta_{kj}$
+ -->
+<IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img103.png"
+ ALT="$ \beta_{kj}$">, we need to differentiate Eq.&nbsp;<A HREF="#eq:multinomial-first-deriv">32</A> with respect to every other <!-- MATH
+ $\beta_{kj}$
+ -->
+<IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img103.png"
+ ALT="$ \beta_{kj}$">.  We can express the general form of this matrix as:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-2nd-deriv"></A><!-- MATH
+ \begin{eqnarray}
+\frac{\partial^2 l(\beta)}{\partial \beta_{kj} \partial \beta_{k^\prime j^\prime}} & = & \frac{\partial}{\partial\beta_{k^\prime j^\prime}} \sum_{i=1}^N y_{ij} x_{ik} - n_i \pi_{ij} x_{ik} \nonumber \\
+& = & \frac{\partial}{\partial\beta_{k^\prime j^\prime}} \sum_{i=1}^N - n_i x_{ik} \pi_{ij} \nonumber \\
+& = & - \sum_{i=1}^N n_i x_{ik} \frac{\partial}{\partial\beta_{k^\prime j^\prime}} \biggl( \frac{e^{\sum_{k=0}^K x_{ik}\beta_{kj}}}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \biggr)
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="86" HEIGHT="61" ALIGN="MIDDLE" BORDER="0"
+ SRC="img129.png"
+ ALT="$\displaystyle \frac{\partial^2 l(\beta)}{\partial \beta_{kj} \partial \beta_{k^\prime j^\prime}}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="207" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img130.png"
+ ALT="$\displaystyle \frac{\partial}{\partial\beta_{k^\prime j^\prime}} \sum_{i=1}^N y_{ij} x_{ik} - n_i \pi_{ij} x_{ik}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="156" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img131.png"
+ ALT="$\displaystyle \frac{\partial}{\partial\beta_{k^\prime j^\prime}} \sum_{i=1}^N - n_i x_{ik} \pi_{ij}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="329" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img132.png"
+ ALT="$\displaystyle - \sum_{i=1}^N n_i x_{ik} \frac{\partial}{\partial\beta_{k^\prime...
+...{ik}\beta_{kj}}}{1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}} \biggr)$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(33)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+Applying the quotient rule of Eq.&nbsp;<A HREF="node5.html#eq:quotient-rule">14</A>, note that the derivatives of the numerator and denominator differ depending on whether or not <!-- MATH
+ $j^\prime = j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img133.png"
+ ALT="$ j^\prime = j$">:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-solve-2nd-deriv-1"></A><!-- MATH
+ \begin{eqnarray}
+f^\prime(a) = g^\prime(a) = e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot x_{ik^\prime} & \qquad & j^\prime = j\nonumber \\
+f^\prime(a) = 0 \qquad g^\prime(a) = e^{\sum_{k=0}^K x_{ik}\beta_{kj^\prime}} \cdot x_{ik^\prime} & \qquad & j^\prime \neq j
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="251" HEIGHT="47" ALIGN="MIDDLE" BORDER="0"
+ SRC="img134.png"
+ ALT="$\displaystyle f^\prime(a) = g^\prime(a) = e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot x_{ik^\prime}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="39" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img135.png"
+ ALT="$\displaystyle \qquad$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="48" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img136.png"
+ ALT="$\displaystyle j^\prime = j$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="299" HEIGHT="48" ALIGN="MIDDLE" BORDER="0"
+ SRC="img137.png"
+ ALT="$\displaystyle f^\prime(a) = 0 \qquad g^\prime(a) = e^{\sum_{k=0}^K x_{ik}\beta_{kj^\prime}} \cdot x_{ik^\prime}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="39" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img135.png"
+ ALT="$\displaystyle \qquad$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="48" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img138.png"
+ ALT="$\displaystyle j^\prime \neq j$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(34)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+Thus, when <!-- MATH
+ $j^\prime = j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img133.png"
+ ALT="$ j^\prime = j$">, the partial derivative in Eq.&nbsp;<A HREF="#eq:multinomial-2nd-deriv">33</A> becomes:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-solve-2nd-deriv-2"></A><!-- MATH
+ \begin{eqnarray}
+& \frac{\big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\big) \cdot e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot x_{ik^\prime} - e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot x_{ik^\prime}}{\big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\big)^2} \nonumber \\
+= & \frac{e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot x_{ik^\prime} \big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}} - e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\big)}{\big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\big)^2} \nonumber \\
+= & \pi_{ij} x_{ik^\prime} (1-\pi_{ij})
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="573" HEIGHT="74" ALIGN="MIDDLE" BORDER="0"
+ SRC="img139.png"
+ ALT="$\displaystyle \frac{\big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\...
+...{ik^\prime}}{\big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\big)^2}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD>&nbsp;</TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="424" HEIGHT="74" ALIGN="MIDDLE" BORDER="0"
+ SRC="img140.png"
+ ALT="$\displaystyle \frac{e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot x_{ik^\prime} \big(...
+..._{kj}}\big)}{\big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\big)^2}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD>&nbsp;</TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="118" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img141.png"
+ ALT="$\displaystyle \pi_{ij} x_{ik^\prime} (1-\pi_{ij})$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(35)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+and when <!-- MATH
+ $j^\prime \neq j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img142.png"
+ ALT="$ j^\prime \neq j$">, they are:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-solve-2nd-deriv-3"></A><!-- MATH
+ \begin{eqnarray}
+& \frac{0 - e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot e^{\sum_{k=0}^K x_{ik}\beta_{kj^\prime}} \cdot x_{ik^\prime}}{\big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\big)^2} \nonumber \\
+= & - \pi_{ij} x_{ik^\prime} \pi_{ij^\prime}
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD>&nbsp;</TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="269" HEIGHT="71" ALIGN="MIDDLE" BORDER="0"
+ SRC="img143.png"
+ ALT="$\displaystyle \frac{0 - e^{\sum_{k=0}^K x_{ik}\beta_{kj}} \cdot e^{\sum_{k=0}^K...
+...{ik^\prime}}{\big(1 + \sum_{j=1}^{J-1}e^{\sum_{k=0}^K x_{ik}\beta_{kj}}\big)^2}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD>&nbsp;</TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="92" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img144.png"
+ ALT="$\displaystyle - \pi_{ij} x_{ik^\prime} \pi_{ij^\prime}$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(36)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+We can now express the matrix of second partial derivatives for the multinomial logistic regression model as:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:multinomial-2nd-deriv-complete"></A><!-- MATH
+ \begin{eqnarray}
+\frac{\partial^2 l(\beta)}{\partial \beta_{kj} \partial \beta_{k^\prime j^\prime}} & = & - \sum_{i=1}^N n_i x_{ik} \pi_{ij} (1-\pi_{ij}) x_{ik^\prime} \qquad j^\prime = j \nonumber \\
+& = & \phantom{-} \sum_{i=1}^N n_i x_{ik} \pi_{ij} \pi_{ij^\prime} x_{ik^\prime} \qquad \qquad j^\prime \neq j
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="86" HEIGHT="61" ALIGN="MIDDLE" BORDER="0"
+ SRC="img129.png"
+ ALT="$\displaystyle \frac{\partial^2 l(\beta)}{\partial \beta_{kj} \partial \beta_{k^\prime j^\prime}}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="280" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img145.png"
+ ALT="$\displaystyle - \sum_{i=1}^N n_i x_{ik} \pi_{ij} (1-\pi_{ij}) x_{ik^\prime} \qquad j^\prime = j$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="276" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img146.png"
+ ALT="$\displaystyle \phantom{-} \sum_{i=1}^N n_i x_{ik} \pi_{ij} \pi_{ij^\prime} x_{ik^\prime} \qquad \qquad j^\prime \neq j$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(37)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html128"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html126"
+  HREF="node8.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html120"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html129"
+  HREF="node11.html">Newton-Raphson</A>
+<B> Up:</B> <A NAME="tex2html127"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html121"
+  HREF="node9.html">The Model</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

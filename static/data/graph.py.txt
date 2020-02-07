@@ -1,0 +1,318 @@
+"""czep's Graph library.
+
+Everyone has their own favorite way to implement graphs, and this one
+is mine.  The simplest way to represent a graph in Python is with a
+dictionary of adjacency lists as GvR describes [1].  David Eppstein
+represents the adjacency list itself as another dictionary, thereby
+enabling storage of edge lengths as well as exploiting the built-in
+advantage that dictionaries have in quickly determining whether a
+key exists [2].
+
+Although such powerful simplicity is attractive, some applications
+require vertices and edges to be associated with arbitrary data.  In
+addition, many algorithms benefit from a class-based approach wherein
+the fundamental building blocks of graphs are formal objects.
+
+References:
+[1] http://www.python.org/doc/essays/graphs.html
+[2] http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/119466
+"""
+__author__ = 'Scott Czepiel <http://czep.net/>'
+__version__ = '1.0'
+
+import heapq
+
+
+class Vertex:
+    """A Vertex object that can be added to a Graph.
+
+    A Graph contains a dictionary of vertices, where each key must
+    be unique within a given Graph.  The Vertex itself cannot be
+    used as a key because it is a mutable object, and dictionary
+    keys must be immutable.  Therefore, when supplying a key, be
+    sure to choose a string, number (int or float), or a tuple, but
+    not something like a list or arbitrary object.
+
+    Since keys are merely unique identifiers, if there is no reason
+    to supply a key explicity, the default behavior will obtain the
+    next available unique value maintained in a class variable."""
+
+    vcount = 0
+    def get_key(self):
+        self.__class__.vcount += 1
+        return self.__class__.vcount
+
+    def __init__(self, key=None, data={}):
+        """Constructor for vertex objects.
+
+        The key is just a way of uniquely identifying the vertex
+        so that it can be easily added to a graph.  Assign any
+        immutable type that you wish to use to identify the vertex,
+        or let the class automatically assign the next available
+        value that it thinks is unique, though no checking is done.
+
+        Any additional information that needs to accompany a vertex
+        can be passed to the 'data' argument.  Many functions
+        assume this to be a dictionary.
+        """
+        # set key
+        if key is None:
+            self.key = self.get_key()
+        else:
+            self.key = key
+        # set data
+        if type(data) == type({}):
+            self.data = data
+        else:
+            self.data = {'data': data}
+        # init adjacency dict
+        self.Adj = {}
+
+    def __repr__(self):
+        """Return a string to describe this vertex."""
+        return "Vertex: '%s'" % str(self.key)
+
+
+class _VertexReference:
+    """Internal object used to store additional data about a vertex.
+
+    Many algorithms require a number of temporary variables to be
+    associated with each vertex.  One approach would be to simply add
+    them to the actual Vertex objects as necessary.  However, I feel
+    it is impolite to ask an object to handle a bunch of variables
+    it knows nothing about.  These variables belong to the algorithm
+    or the graph, but certainly not to the vertex.  This could cause
+    problems if multiple algorithms are accessing the same variables
+    simultaneously.  Furthermore, it's not just the addition of
+    variables that justifies a separate object:  we need to override
+    the comparison operators to use Vertices with the heapq library.
+    We can only do this once for the Vertex class, but by subclassing
+    a reference to the Vertex, we can accomodate an endless number
+    of different representations."""
+
+    def __init__(self, g, key, data={}):
+        """Create a reference to a Vertex in the context of a Graph.
+
+        The key is any immutable object that serves to identify a
+        Vertex.  Note that we don't really hold a reference to a
+        Vertex object itself, rather, we hold a reference to the
+        unique identifier of a Vertex in a given Graph.
+        """
+        if not isinstance(g, Graph):
+            raise ValueError, 'Required argument is not a Graph.'
+        if key not in g.V:
+            raise KeyError, '%s not found in Graph.' % str(key)
+        self.g = g
+        self.key = key
+        # set data
+        if type(data) == type({}):
+            self.data = data
+        else:
+            self.data = {'data': data}
+
+
+class _SingleSourceVertex(_VertexReference):
+    """Vertex reference used in single-source probs, eg. Dijkstra."""
+
+    def __init__(self, *args):
+        _VertexReference.__init__(self, *args)
+
+    def __repr__(self):
+        return "*VertexRef: '%s'" % str(self.key)
+
+    def __lt__(self, other): return self.data['d'] < other.data['d']
+    def __le__(self, other): return self.data['d'] <= other.data['d']
+    def __eq__(self, other): return self.key == other.key
+    def __ne__(self, other): return self.key != other.key
+    def __gt__(self, other): return self.data['d'] > other.data['d']
+    def __ge__(self, other): return self.data['d'] >= other.data['d']
+
+
+class Edge:
+    """A directed edge from one vertex to another.
+
+    This is a directed edge, i.e. a one-way street.  An edge has a
+    start vertex, u, and an end vertex, v.  The pair (u, v) uniquely
+    identifies an edge.  Duplicate edges cannot exist in the same
+    graph.  Note that the opposite way in a two-way street would
+    be represented as another edge, identified as (v, u)."""
+
+    def __init__(self, u, v, w=1.0, data={}):
+        """Constructor for edge objects.
+
+        Both u and v must be vertices, else an error will be raised.
+        The weight of the edge defaults to 1.0, and as with vertices
+        any arbitrary data can be stored in the dict 'data'.
+        """
+        if not isinstance(u, Vertex) or not isinstance(v, Vertex):
+            raise ValueError, 'Edge constructor requires 2 Vertices.'
+        self.u = u
+        self.v = v
+        self.w = w
+        # set data
+        if type(data) == type({}):
+            self.data = data
+        else:
+            self.data = {'data': data}
+
+    def __repr__(self):
+        return "Edge from %s to %s with weight %f." %(self.u,
+            self.v, self.w)
+
+class Graph:
+    """A Graph is a collection of vertices connected by edges.
+
+    The Graph maintains two dictionaries internally, V for Vertices
+    and E for edges.  V is keyed by a Vertex object's 'key' attribute.
+    E is keyed by the tuple (u, v) that serves as a unique identifier
+    of an edge from vertex u to vertex v."""
+
+    def __init__(self, g=None):
+        """Graph constructor.
+
+        If no arguments are passed, the graph will be created empty.
+        Otherwise, g will be parsed as a dictionary of adjacency lists
+        (represented as a dict of dicts).  All appropriate vertices
+        and edges will be created implicitly.
+        """
+        self.V = {}
+        self.E = {}
+        if g is not None:
+            if type(g) != type({}):
+                raise ValueError, 'Optional arg must be a dictionary'
+            # parse g as a dict of adjacency dicts
+            for u in g:
+                self.add_vertex(Vertex(key=u))
+                for v in g[u]:
+                    self.add_vertex(Vertex(key=v))
+                    self.add_edge(Edge(self.V[u], self.V[v], w=g[u][v]))
+
+    def add_vertex(self, u):
+        """Add Vertex u to the Graph."""
+        if not isinstance(u, Vertex):
+            raise ValueError, 'Required argument must be a Vertex.'
+        # ignore if already exists
+        if u.key in self.V: return
+        # add to the dictionary of vertices using the key
+        self.V[u.key] = u
+
+    def add_edge(self, e):
+        """Add Edge e to the Graph."""
+        if not isinstance(e, Edge):
+            raise ValueError, 'Required argument must be an Edge.'
+        # ignore if already exists
+        if (e.u.key, e.v.key) in self.E: return
+        # add to the dictionary of edges using the tuple (u, v) as key
+        self.E[(e.u.key, e.v.key)] = e
+        # add v's key to u's adjacency dict, with w as the value
+        # NOTE:  this is not the same as:  e.u.Adj[e.v.key] = e.w
+        # Q: Why? (+3 Bonus Points)
+        self.V[e.u.key].Adj[e.v.key] = e.w
+    
+    def remove_vertex(self, u):
+        """Remove a vertex identified by key from the Graph."""
+        if u in self.V:
+            del self.V[u]
+            ebad = []
+            for e in self.E:
+                if self.E[e].u.key == u or self.E[e].v.key == u:
+                    ebad.append(e)
+            while ebad:
+                self.remove_edge(ebad.pop(0))
+    
+    def remove_edge(self, e):
+        """Remove an edge identified by key from the Graph."""
+        if e in self.E:
+            del self.E[e]
+    
+    def Vcount(self):
+        return len(self.V)
+
+    def Ecount(self):
+        return len(self.E)
+    
+    def dijkstra(self, s):
+        """Dijkstra's algorithm.
+        
+        Return the shortest-paths tree containing all vertices
+        reachable from the start vertex, s.  This tree is represented
+        as a dict of dicts where the key is the id of the vertex.
+        The shortest-paths distance, d, and the parent of the vertex
+        in the tree are also stored, eg.:
+        S = { 'v': {'d': 9, 'par': 'u'},
+              'u': {'d': 8, 'par': 'x'},
+              'x': {'d': 5, 'par': 's'} }
+        """
+        # initialize the shortest paths tree to be returned
+        S = {}
+        # return if start vertex is not in the graph
+        if s not in self.V: return S
+        # initialize a priority queue with start vertex
+        Q = [(0.0, s, None)]
+        # loop for each vertex reference in Q
+        while Q:
+            # extract the minimum element from Q
+            d, u, par = heapq.heappop(Q)
+            # ignore if u is already in S
+            if u not in S:
+                # add u to S
+                S[u] = {'d': d, 'par': par}
+                # relax each v adjacent to u
+                for v in self.V[u].Adj:
+                    heapq.heappush(Q, (d + self.V[u].Adj[v], v, u))                    
+        return S
+        
+    def bfs(self, s):
+        """Breadth-first search.
+        
+        Return a breadth-first search tree containing all vertices
+        reachable from s.  The tree is represented as a dict of dicts
+        where the key is the id of the vertex.  The id of the parent
+        vertex and the degree of separation from the start vertex
+        are also stored, eg:
+        """
+        S = {}
+        if s not in self.V: return S
+        # initialize a FIFO queue of vertices to explore
+        Q = [(0, s, None)]
+        while Q:
+            d, u, par = Q.pop(0)
+            if u not in S:
+                S[u] = {'d': d, 'par': par}
+                # add all of u's neighbors to the Q
+                for v in self.V[u].Adj:
+                    Q.append((d+1, v, u))
+        return S
+
+
+if __name__ == '__main__':
+
+    # Canonical example from CLR 1e, p. 528
+    # The shortest path from s to v is ['s', 'x', 'u', 'v']
+    # and has length 9.
+    G = Graph({'s':{'u':10, 'x':5},
+         'u':{'v':1, 'x':2},
+         'v':{'y':4},
+         'x':{'u':3, 'v':9, 'y':2},
+         'y':{'s':7, 'v':6}})
+    
+    print "This graph has %d vertices and %d edges." % (G.Vcount(), G.Ecount())
+
+    sptree = G.dijkstra('s')
+    path = []
+    vert = 'v'
+    dist = sptree[vert]['d']
+    while vert:
+        path.append(vert)
+        vert = sptree[vert]['par']
+    path.reverse()
+    print "\nThe shortest path from s to v is %s" % str(path)
+    print "and has length %d." % dist
+    
+    bfstree = G.bfs('s')
+    print "\nHere is a breadth-first search tree rooted at s:"
+    print "Degree\tVertex\tParent"
+    print "======\t======\t======"
+    for pair in sorted([(v['d'], k, v['par']) for k, v in bfstree.iteritems()]):
+        print "%3d%8s%9s" % (pair[0], pair[1], pair[2])
+

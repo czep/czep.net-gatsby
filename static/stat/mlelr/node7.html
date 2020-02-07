@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Caveats</TITLE>
+<META NAME="description" CONTENT="Caveats">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="previous" HREF="node6.html">
+<LINK REL="up" HREF="node3.html">
+<LINK REL="next" HREF="node8.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html97"
+  HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html95"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html91"
+  HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html98"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<B> Up:</B> <A NAME="tex2html96"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html92"
+  HREF="node6.html">The Newton-Raphson Method</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00021400000000000000">
+Caveats</A>
+</H3>
+There are two cautionary notes to consider during the iteration procedure.  First, it is possible for a parameter estimate to tend to infinity.  This is usually a sign that the model is either poorly specified or is behaving badly due to data sparseness in one or more populations.  Obviously, a parameter that tends to infinity will never converge.  However, it is sometimes useful to allow a model to converge even in the presence of infinite parameters.  To accomplish this, each estimate can be tested against a threshold above which it is considered to be infinite.  At that point, the iterations can continue while holding the infinite parameter constant, ignoring its new values in susbsequent iterations, and exempting it from the global test for convergence.  The SAS System uses two criteria to test whether a parameter estimate is tending to infinity in PROC CATMOD with the /ML option.  If (i) the absolute value of the estimate exceeds five divided by the range of the corresponding independent variable, and (ii) the standard error of the estimate is at least three times greater than the estimate itself.
+
+<P>
+A second cautionary note deals with a limitation of the Newton-Raphson method.  Given certain conditions, it is possible for a given estimate to overshoot the true root in such a way that subsequent iterations enter into a repeating cycle that will never converge.  To counter this possibility at each iteration, verify that the value for the likelihood function evaluated at that point is in fact higher than it was during the previous iteration.  If at any point the likelihood decreases, this is a sign that the iterations have lost track of the true root and are in danger of converging to a local maximum or not converging at all.  One strategy for dealing with this is to apply a ``step-halving'' function wherein half the distance between the current and prior estimates is tested.  If the likelihood at that point is still lower than for the last iteration then half the distance again is tested.  This continues for a reasonable number of ``sub-iterations'' until reaching a point where the likelihood does increase.  This is again the method used by the SAS System in PROC CATMOD with the /ML option.  We will look at these two caveats in more detail in the section on implementation.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html97"
+  HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html95"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html91"
+  HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html98"
+  HREF="node8.html">Multinomial Logistic Regression</A>
+<B> Up:</B> <A NAME="tex2html96"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html92"
+  HREF="node6.html">The Newton-Raphson Method</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

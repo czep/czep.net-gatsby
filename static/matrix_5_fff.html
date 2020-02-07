@@ -1,0 +1,345 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<title>test</title>
+<meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
+
+<script language="JavaScript" type="text/javascript">
+<!--
+
+///////////////////////////////////////////////////////////
+// Binary Matrix Animation
+
+// global variables
+var NR = 0;         // number of rows in the matrix
+var NC = 0;         // number of cols in the matrix
+var SKIPTOL = 0.20; // percent chance blip will skip a beat
+var VTOL = 0.10;    // percent chance blip will change speed
+var LCETOL = 0.05;  // percent chance of life changing event
+var MINBLIPS = 2;   // minimum number of blips 
+var MAXBPCT = 0.20; // maximum number of blips as % of total cells
+var MAXBLIPS = 0;   // maximum number of blips - auto calculated in init
+var cyc;            // cycle tick index, range [1,16]
+var state = 0;      // 0 onload, 1 if animating
+
+// array of pointers to blips
+var blips = new Array(1);
+
+// linked list pointing to each cell's predecessor in 2-d array
+var Cells = new Array(1);
+
+// color scheme
+
+// use below for black background
+//var TAIL = new Array("#3b3", "#3a3", "#393", "#383", "#373", "#363", "#353", "#343");
+//var CELL_OFF = "#333";
+//var CELL_ON = "#3c3"
+
+// use below for white background
+var TAIL = new Array("#3b3", "#4b4", "#6b6", "#8c8", "#aca", "#bcb", "#cdc", "#ded");
+var CELL_OFF = "#eee";
+var CELL_ON = "#3c3"
+
+// speed determines on how many cycle ticks a blip is updated
+// if (cyc % speed == 0) then update, else wait for next cycle tick
+// use only these speeds:
+// 1 is the fastest since it will be updated at every tick
+// 2 is updated every even tick, 8 times
+// 4 is updated 4 times (ticks 4, 8, 12, and 16)
+// 8 is updated twice
+// 16 is the slowest, it will only be updated on tick 16
+
+
+// constructor for blip object
+function Blip() {
+
+    // choose a random starting location
+    var r = Math.floor(Math.random() * NR);
+    var c = Math.floor(Math.random() * NC);
+    
+    // choose a random speed as a power of two in [0,4]
+    this.v = Math.floor(Math.random() * 5);
+    
+    // formulate the tail length as a function of speed
+    this.tail = 3 - this.v;
+    if (this.tail == -1) {
+        this.tail = 0;
+    }
+    else {
+        this.tail = Math.pow(2, this.tail);
+    }
+    this.v = Math.pow(2, this.v);
+    
+    // point to the cell containing the blip
+    this.cell = Cells[r][c];
+
+}
+
+// constructor for cell object
+function Cell(r, c) {
+
+    // set row and col properties
+    this.r = r;
+    this.c = c;
+    
+    // point to actual table cell
+    this.obj = document.getElementById("matrix").rows[r].cells[c];
+
+    // pointers for previous and next cells
+    this.prev = "";
+    this.next = "";
+
+}   
+
+// initialize - run in body onload
+function init() {
+
+    var i;
+    var j;
+    var ibc;
+    
+    // global vars
+    NR = document.getElementById("matrix").rows.length;
+    NC = document.getElementById("matrix").rows[0].cells.length;
+    MAXBLIPS = MAXBPCT * NR * NC;
+
+    // initialize cell objects
+    for (i = 0; i < NR; i++) {
+        Cells[i] = new Array(NC);
+        for (j = 0; j < NC; j++) {
+            Cells[i][j] = new Cell(i, j);
+        }
+    }
+    
+    // determine previous and next cells
+    for (i = 0; i < NR; i++) {
+    
+        for (j = 0; j < NC; j++) {
+            
+            // determine prev cell                    
+            if (j > 0) {
+                Cells[i][j].prev = Cells[i][j-1];
+            }
+            else {
+                if (i > 0) {
+                    Cells[i][j].prev = Cells[i-1][NC-1];
+                }
+                else {
+                    Cells[i][j].prev = Cells[NR-1][NC-1];
+                }
+            }
+            
+            // determine next cell
+            if (j < NC - 1) {
+                Cells[i][j].next = Cells[i][j+1];
+            }
+            else {
+                if (i < NR - 1) {
+                    Cells[i][j].next = Cells[i+1][0];
+                }
+                else {
+                    Cells[i][j].next = Cells[0][0];
+                }
+            }
+        }
+    }
+            
+    
+    // initialize blips
+    ibc = Math.floor(NR * NC * 0.05);
+    for (i = 0; i < ibc; i++) {
+        blips[i] = new Blip();
+    }
+    cyc = 1;
+    
+}
+
+function animate() {
+
+    var i;
+    var j;
+    var skip;
+    var c;
+    var vdelta;
+    var giveth;
+    var taketh;
+    var newblip;
+    var oldtail;
+    
+    // main loop for each blip
+    for (i = 0; i < blips.length; i++) {
+    
+        // test whether to update based on speed
+        if (cyc % blips[i].v == 0) {
+        
+            // determine whether blip skips a beat
+            skip = Math.random();
+            if (skip > SKIPTOL) {
+            
+                // erase current blip location
+                blips[i].cell.obj.innerHTML = "0";
+                blips[i].cell.obj.style.background = CELL_OFF;                                
+                
+                // get new blip location
+                blips[i].cell = blips[i].cell.next;
+                
+                // color curent blip location
+                blips[i].cell.obj.innerHTML = "1";
+                blips[i].cell.obj.style.background = CELL_ON;
+                
+                // repaint tail
+                c = blips[i].cell.prev;
+                for (j = 0; j < blips[i].tail; j++) {
+                    c.obj.style.background = TAIL[j];
+                    c = c.prev;                    
+                }
+                
+                // chop tail
+                c.obj.style.background = CELL_OFF;
+                
+                // paint leader
+                if (blips[i].tail > 1) {
+                    c = blips[i].cell.next;
+                    c.obj.style.background = TAIL[4];
+                }
+                                
+            }
+            
+            // skip a beat, chop off end of tail
+            else {
+                if (blips[i].tail > 1) {
+                    c = blips[i].cell.prev;
+                    for (j = 0; j < blips[i].tail - 1; j++) {
+                        c = c.prev;
+                    }
+                    c.obj.style.background = CELL_OFF;
+                }
+            }
+            
+            // determine whether blip should change speed
+            vdelta = Math.random();
+            if (vdelta < VTOL) {
+                vdelta = Math.random();
+                blips[i].v = Math.floor(vdelta * 5);
+                oldtail = blips[i].tail;
+                blips[i].tail = 3 - blips[i].v;
+                if (blips[i].tail == -1) {
+                    blips[i].tail = 0;
+                }
+                else {
+                    blips[i].tail = Math.pow(2, blips[i].tail);
+                }
+                
+                blips[i].v = Math.pow(2, blips[i].v);
+                
+                // ensure tail is painted correctly
+                if (oldtail > blips[i].tail) {
+                    c = blips[i].cell.prev;
+                    for (j = 0; j <= oldtail; j++) {
+                        if (j >= blips[i].tail) {
+                            c.obj.style.background = CELL_OFF;
+                        }
+                        c = c.prev;                    
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    // determine whether to kill off or add a new blip
+    if (cyc == 16) {
+        taketh = Math.random();
+        if (taketh < LCETOL && blips.length >= MINBLIPS) {
+            newblip = blips.pop();
+            newblip.cell.obj.style.background = CELL_OFF;
+            newblip.cell.next.obj.style.background = CELL_OFF;
+            c = newblip.cell.prev;
+            for (i = 0; i < newblip.tail; i++) {
+                c.obj.style.background = CELL_OFF;
+                c = c.prev;                    
+            }            
+            delete newblip;
+        }
+        giveth = Math.random();
+        if (giveth < LCETOL && blips.length < MAXBLIPS) {
+            newblip = new Blip();
+            blips.push(newblip);
+            blips.reverse;
+        }
+    }
+    
+    
+    // increment cycle tick
+    cyc++;
+    if (cyc > 16) cyc = 1;   
+
+    // return in 25ms
+    timex = setTimeout("animate();", 25);    
+}
+
+function do_animate() {
+
+    if (state == 0) {
+        state = 1;
+        animate();
+    }
+    else {
+        clearTimeout(timex);
+        state = 0;
+    }
+
+}
+
+-->
+</script>
+
+<style type="text/css">
+<!--
+
+/* use one of the following depending on desired bkg color */
+
+/* black background */
+/*
+body { background: #000; }
+p { color: #eee;}
+#matrix { background: #333; border: 2px #444 solid; }
+#matrix td { color: #eee; background: #333; margin: 0; padding: 2px;
+     font: 10px Courier, "Courier New", "Andale Mono", Monaco, monospace;
+}
+*/
+
+/* white background */
+
+body { background: #fff; }
+p { color: #111; }
+#matrix { background: #eee; border: 2px #ddd solid; }
+#matrix td { color: #111; background: #eee; margin: 0; padding: 2px;
+     font: 10px Courier, "Courier New", "Andale Mono", Monaco, monospace;
+}
+
+-->
+</style>
+
+
+
+</head>
+<body onLoad="init()";>
+
+<p>Clicking on the table toggles animation</p>
+
+<table id="matrix" onclick="do_animate(); return false;">
+<!-- the matrix does not need to be square, but must have the same 
+     number of cells in each row -->
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+</table>
+
+
+</body>
+</html>

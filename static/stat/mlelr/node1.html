@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Introduction</TITLE>
+<META NAME="description" CONTENT="Introduction">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="next" HREF="node2.html">
+<LINK REL="previous" HREF="mlelr_www.html">
+<LINK REL="up" HREF="mlelr_www.html">
+<LINK REL="next" HREF="node2.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html26"
+  HREF="node2.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html24"
+  HREF="mlelr_www.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html18"
+  HREF="mlelr_www.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html27"
+  HREF="node2.html">Theory</A>
+<B> Up:</B> <A NAME="tex2html25"
+  HREF="mlelr_www.html">Maximum Likelihood Estimation of</A>
+<B> Previous:</B> <A NAME="tex2html19"
+  HREF="mlelr_www.html">Maximum Likelihood Estimation of</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00010000000000000000">
+Introduction</A>
+</H1>
+Logistic regression is widely used to model the outcomes of a categorical dependent variable.  For categorical variables it is inappropriate to use linear regression because the response values are not measured on a ratio scale and the error terms are not normally distributed.  In addition, the linear regression model can generate as predicted values any real number ranging from negative to positive infinity, whereas a categorical variable can only take on a limited number of discrete values within a specified range.
+
+<P>
+The theory of generalized linear models of Nelder and Wedderburn [<A
+ HREF="node13.html#nelder">9</A>] identifies a number of key properties that are shared by a broad class of distributions.  This has allowed for the development of modeling techniques that can be used for categorical variables in a way roughly analogous to that in which the linear regression model is used for continuous variables.  Logistic regression has proven to be one of the most versatile techniques in the class of generalized linear models.
+
+<P>
+Whereas linear regression models equate the expected value of the dependent variable to a linear combination of independent variables and their corresponding parameters, generalized linear models equate the linear component to some function of the probability of a given outcome on the dependent variable.  In logistic regression, that function is the logit transform:  the natural logarithm of the odds that some event will occur.  In linear regression, parameters are estimated using the method of least squares by minimizing the sum of squared deviations of predicted values from observed values.  This involves solving a system of <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> linear equations each having <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> unknown variables, which is usually an algebraically straightforward task.  For logistic regression, least squares estimation is not capable of producing minimum variance unbiased estimators for the actual parameters.  In its place, maximum likelihood estimation is used to solve for the parameters that best fit the data.
+
+<P>
+In the next section, we will specify the logistic regression model for a binary dependent variable and show how the model is estimated using maximum likelihood.  Following that, the model will be generalized to a dependent variable having two or more categories.  In the final section, we outline a generic implementation of the algorithm to estimate logistic regression models.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html26"
+  HREF="node2.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html24"
+  HREF="mlelr_www.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html18"
+  HREF="mlelr_www.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html27"
+  HREF="node2.html">Theory</A>
+<B> Up:</B> <A NAME="tex2html25"
+  HREF="mlelr_www.html">Maximum Likelihood Estimation of</A>
+<B> Previous:</B> <A NAME="tex2html19"
+  HREF="mlelr_www.html">Maximum Likelihood Estimation of</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

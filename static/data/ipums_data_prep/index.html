@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css" media="all">@import url("../../main.css");</style>
+<style type="text/css" media="all">
+    table {
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid black;
+    }
+    caption {
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: bold;
+        margin-top: 1em;
+    }
+    tr, th, td {
+        margin: 10px;
+        border: 1px solid black;
+    }
+    th, td {
+        text-align: center;
+    }
+    .cbox2 .e .content {
+        padding: 0 46px 0 30px;
+    }
+    pre {
+        margin: 1em 0 1em 0;
+        padding: 1em;
+        border: 1px solid #555;
+    }
+    a:hover {
+        background: #99f;
+    }
+</style>
+<title>ipums_data_prep.py</title>
+</head>
+
+<body>
+<div id="one">
+<div id="two">
+
+
+<h1>ipums_data_prep.py</h1>
+
+<!-- begin cbox -->
+<div class="cbox2">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>A Python script to prepare IPUMS dataset extracts for loading into an RDBMS</h2>
+<ul>
+<li><a href="#Overview">Overview</a></li>
+<li><a href="#Download">Download</a></li>
+<li><a href="#Instructions">Instructions for use</a></li>
+<li><a href="#Future">Future Work</a></li>
+<li><a href="#Legal">Legal</a></li>
+</ul>
+
+<br />
+<h2><a name="Overview">Overview</a></h2>
+<p>
+The <a href="http://www.ipums.org/">IPUMS Project</a> at the <a href="http://www.pop.umn.edu/">Minnesota Population Center</a> of the <a href="http://www.umn.edu/">University of Minnesota</a> provides an invaluable service to researchers, scientists, academics, state agencies, social service workers, cultural critics, data analysts, interested citizens and generally anyone with a burning need or curiosity for access to the single largest collection of historical and current microdata on the US and other world populations.  The acronym stands for Integrated Public Use Microdata Samples and the original mission of the project was to compile all available US Census data, clean it, standardize the variables for consistency across years, and make the data available with an easy to use extraction system.
+</p>
+<p>
+As of October 2011, the ever-growing list of datasets provided by the IPUMS project includes the <a href="http://www.census.gov/">US Census</a> beginning in 1850, the <a href="http://www.census.gov/acs/www/">American Community Survey</a> from 2001, the <a href="http://www.bls.gov/cps/">Current Population Survey</a> from 1962, and over 185 censuses from around the world.  All of the datasets that IPUMS provides are available from other public sources, but not nearly in so convenient a format.  In addition to basic cleaning, IPUMS "harmonizes" the data by lining up value labels so they match up from year to year.  This makes cross-year analysis much easier than dealing with the original variable codings.  They also provide a lot of helpful constructed variables that are not part of the original data but are nonetheless highly useful, such as number of families in household and the spouse's location in the household record.  All this amounts to a tremendous value-add, to recreate this work from the original source data would be a tiresome duplication of effort.  The work IPUMS has done on these datasets is truly inspiring.
+</p>
+<p>
+When you download an extract from IPUMS, the automated system provides a codebook and machine-readable syntax files for importing the data into <a href="http://en.wikipedia.org/wiki/SPSS">SPSS</a>, <a href="http://en.wikipedia.org/wiki/SAS_%28software%29">SAS</a>, and <a href="http://en.wikipedia.org/wiki/STATA">Stata</a>.  However, if you do not have access to one of these statistical packages or if you are interested in using a traditional database for bulk storage to which your stat package can connect to pull samples, then you have to manually parse the data into a format that can be read into your database.  The Python script I am making available here can prepare the data and metadata for import into an RDBMS such as <a href="http://www.postgresql.org/">PostgreSQL</a>, <a href="http://www.mysql.com/">MySQL</a>, <a href="http://www.oracle.com/us/products/database/index.html">Oracle</a>, or <a href="http://www.microsoft.com/sqlserver/">Microsoft SQL Server</a>.  Note that I have only tested this with my preferred database, PostgreSQL 9.1, but only minor modifications -- if any -- should be needed to work with other systems.  The script can be downloaded via the link below, following which is a complete set of instructions on how to run the script.
+</p>
+
+<br />
+<h2><a name="Download">Download</a></h2>
+<p>
+<ul>
+<li><a href="ipums_data_prep.py.txt">ipums_data_prep.py</a></li>
+</ul>
+</p>
+
+<br />
+<h2><a name="Instructions">Instructions for use</a></h2>
+<p>
+In order to run this script, you will need to download two files from the extraction system at IPUMS:  1) the raw data file which will have a ".dat.gz" extension, and 2) the SPSS syntax file, which will have an extension of ".sps".  The raw data file has been compressed with gzip, but do not unzip it!  The script will decompress it as needed.
+</p><p>
+This is a python script so you will need a python interpreter, typically "/usr/bin/python" on unix-based platforms, including Macs.  See <a href="http://www.python.org/">python.org</a> for more information.
+</p><p>
+ipums_data_prep.py is designed to help you load an IPUMS data extract into your own RDBMS with these 4 steps:
+<ol>
+<li>Output the ddl (data definition language) to create the main data table or tables</li>
+<li>Write the variable names and labels to a file</li>
+<li>Write the variable names, values, and value labels to a file</li>
+<li>Parse the raw fixed format data file and save it in a tab-delimited format</li>
+</ol>
+</p><p>
+I assume a schema in which there is one (or more) main data tables and two additional tables to store the metadata:  one for variable labels and one for value labels.  The "vars" and "vals" tables can be created like this:
+</p>
+<pre>
+/* ddl statements for metadata tables */
+create table ipums.vars (
+    varname     varchar(20),
+    varlabel    varchar(100)
+);
+
+create table ipums.vals (
+    varname     varchar(20),
+    value       int,
+    label       varchar(200)
+);
+</pre>
+<p>
+The ddl to create the main data table(s) depends on the variables and type of extract you selected.  To do this, my script reads the spss syntax file that is provided by the IPUMS extract system.  It will read all the variable names, determine whether they are numeric or alphanumeric, and also determine their length.  Numeric variables will be treated as ints or bigints (if they exceed 9 digits).  Alphanumeric variables will become varchar(n) where n is the length of the variable field.  If implied decimal places are included in the variable specification, then the variables will be treated as double precision.  If you have limited disk space, you can allow for numeric variables with 4 or fewer digits be treated as smallint, by uncommenting two lines in the function get_data_ddl.  My opinion is that this is a micro-optimization that makes maintenance and portability more difficult.  Smallints may also incur run-time performance penalties.  If you are that concerned about disk space, I would suggest a modest investment in a new hard drive.
+</p><p>
+The default for an IPUMS extract is rectangular, in which all records contain all the same variables.  This is the most convenient way to work with the data because you do not have to bother with joining household and person records.  The alternative format is hierarchical, where household records and person records are separate and each record only contains the variables pertinent to its record type.  For a rectangular extract, you will only need one main data table, but for a hierarchical one, you need to create two tables, one for the household records and one for the person records.  The script automatically determines which type of extract it is dealing with, and will output either one or two sets of create table statements with the following command:
+</p>
+<pre>
+$ ipums_data_prep.py ddl spss-syntax-file
+</pre>
+<p>
+The second and third steps are optional since they merely involve the metadata--variable labels and value labels.  You don't strictly need to import this metadata and instead can rely on the codebook or the IPUMS website which provide detailed documentation for all variables.  If you create a "vars" table as above, use the following command to write the variable names and variable labels, tab-delimited, to the output file name you specify on the command line.
+</p>
+<pre>
+$ ipums_data_prep.py vars spss-syntax-file output-file
+</pre>
+<p>
+In PostgreSQL, you can use the COPY command to import this file into the vars table as created above.
+</p>
+<pre>
+# copy ipums.vars from 'output-file' with delimiter as E'\t' null as '';
+</pre>
+<p>
+Next, use this command to output the variable names, values, and value labels to a file.
+</p>
+<pre>
+$ ipums_data_prep.py vals spss-syntax-file output-file
+</pre>
+<p>
+This file can now also be imported to the vals table using the COPY command.  One issue to note is that while SPSS will allow for alphanumeric variables to have value labels, in the schema I've created the value must be integral, so value labels for non-numeric variables will not be included.  The alphanumeric value labels I have found so far haven't been very informative, so I am not currently considering a work-around for this.
+</p><p>
+The real fun happens in Step 4.  The gzipped raw data file supplied by IPUMS is in a fixed-field format.  While statistical packages have flexible enough facilities for parsing such files, most RDBMS systems rely on delimited files for bulk loading.  The script uses the variable start and end positions to extract each variable from the fixed-field format and output to a tab-delimited file which can be used by the COPY command in PostgreSQL or similar commands in other database systems.
+</p>
+<pre>
+$ ipums_data_prep.py data spss-syntax-file ipums-gzipped-data-file output-file [maxrows]
+</pre>
+<p>
+Here, we specify "data" as the second argument followed by the path to the spss syntax file, path to the raw ".dat.gz" data file provided by IPUMS, and an output file to be created with the tab-delimited dataset.  You can also include an optional argument "maxrows" which will limit the number of lines that will be read.  This is useful for testing, to make sure you get the results you expect.  For example, if this is the first extract from IPUMS USA and you want to read the first 10 rows from the raw dataset and write the results to a file "outfile.dat", run the script like this:
+</p>
+<pre>
+$ ipums_data_prep.py data usa_00001.sps usa_00001.dat.gz outfile.dat 10
+</pre>
+<p>
+If your extract is hierarchical instead of rectangular, this command will actually create two output files, named "outfile_H.dat" and "outfile_P.dat" corresponding to the H and P records, respectively.  As of this writing, I'm not aware of IPUMS data that uses additional record types, but if any additional record types are encountered, they will also be created as separate files.  The files will match the output from the "ddl" command in Step 1--there will be one file for each record type just as there is one create table statement for each record type.
+</p><p>
+The first three steps require very little run time, since they involve parsing a small syntax file.  Even 20,000 value labels do not take long to process.  However, Step 4 can take considerably more time.  For the 2000 Census 5% file with over 14MM records, Step 4 took about 70 minutes to complete on my system.
+</p>
+
+<br />
+<h2><a name="Future">Future Work</a></h2>
+<p>
+IPUMS has recently begun distributing their codebook in the <a href="http://www.icpsr.umich.edu/DDI/">DDI format</a> developed at the <a href="http://www.icpsr.umich.edu/">ICPSR</a>.  This provides a great deal more metadata than what is available in the variable labels and value labels sections of the spss syntax files.  It is also more rigorously structured than an spss syntax file and therefore would be a more robust source from which to parse.  However, at this point I am far more comfortable with spss syntax than the XML format of the DDI so for now the parsing requires the spss file.
+</p><p>
+If you find this useful, if you find any bugs, if you have any suggestions or questions, please let me know.  You can reach me at the contact link below.
+</p>
+
+<br />
+<h2><a name="Legal">Legal</a></h2>
+
+<p>
+<a href="ipums_data_prep.py.txt">ipums_data_prep.py</a></li> is licensed under the <a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License</a>.
+</p>
+<p>
+Neither this website nor its author are affiliated with the IPUMS project, the Minnesota Population Center or the University of Minnesota.  This program was produced entirely independently and is neither endorsed nor supported by the IPUMS project, the Minnesota Population Center or the University of Minnesota.
+</p><p>
+The official citation for the IPUMS project is available at this link:
+<a href="http://usa.ipums.org/usa/cite.shtml">http://usa.ipums.org/usa/cite.shtml</a>
+</p><p>
+Use of any IPUMS data requires registration on their website and acceptance of <a href="http://usa.ipums.org/usa-action/register/0">the IPUMS Usage policy</a>.
+</p><p>
+I will reiterate their requirement that you "Use it for GOOD -- never for EVIL".
+</p>
+<p>
+<a href="http://czep.net/contact/">Contact the author</a>.
+</p>
+
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+</div><!-- two -->
+</div><!-- one -->
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css" media="all">@import url(../main.css);</style>
+<style type="text/css" media="all">
+    table {
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid black;
+    }
+    caption {
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: bold;
+        margin-top: 1em;
+    }
+    tr, th, td {
+        margin: 10px;
+        border: 1px solid black;
+    }
+    th, td {
+        text-align: center;
+    }
+    .cbox2 .e .content {
+        padding: 0 46px 0 30px;
+    }
+    pre {
+        margin: 1em 0 1em 0;
+        padding: 1em;
+        border: 1px solid #555;
+    }
+    .callout {
+        margin: 0.8em;
+        border: 1px solid #777;
+        font-weight: bold;
+        color: #900;
+        padding: 1em;
+        float: right;
+    }
+</style>
+<title>Shakespeare's Monkeys</title>
+</head>
+
+<body>
+<div id="one">
+<div id="two">
+
+<h1>Shakespeare's Monkeys</h1>
+
+<!-- begin cbox -->
+<div class="cbox2">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>How long would it take a monkey on a typewriter to recreate the complete works of Shakespeare?</h2>
+
+<p>
+The legendary "Infininte Monkeys Theorem" and its many variations is often invoked as a witty means to illustrate how brute force computation can accomplish a seemingly most improbable task.  The basic formulation is that given infinite time, some number of monkeys placed in front of the same number of typewriters will eventually reproduce some arbitrarily extensive collection of literature.  Much effort has been directed toward proving or falsifying the theorem, but comparatively little practical work has been done to discover the empirical parameters of the underlying equation.  In this essay, we will investigate one explicit formulation of the theorem and attempt a limited parameterization of the problem in an effort to answer the daunting question raised above.
+</p>
+
+<p>
+Since this theme has many variations, we will need to define the exact terms we intend to subject to our present scrutiny.  Many incarnations presume an infinite number of monkeys.  We argue this to be a degenerate case:  given an infinite number of monkeys, time sufficient for the average monkey to strike one key need transpire before an infinite sequence of characters would be generated.  Any and all possible finite sequences of characters would be discoverable within this infinite string.  QED.
+</p>
+
+<p>
+The case becomes far more interesting if we assume a finite number of monkeys.  For the sake of argument, we will focus on just one monkey, since in our understanding of the monkey's mental schematics,  multiple monkeys would not recognize any algorithmic benefits from parallelism.  Generalizing the solution from one to multiple monkeys would be a linear adjustment proportional to N.
+</p>
+
+<p>
+We will need to assume a highly reductionistic view of a model monkey.  Since actual monkeys when presented with actual typewriters tend to behave in vastly unpredictable ways, the mathematics involved in estimating the productivity of a real monkey would be very difficult.  To reduce the complexity of the probabilistic formulae, we will treat our monkey as a random keystroke generator.  It might also help if you assume that the monkey is a perfect sphere.
+</p>
+
+<p>
+How quickly can our monkey type?  Clearly, words have no meaning to our monkey so its basic unit of processing will be the keystroke.  Let's assume a rate of one keystroke per second.  This ought not be too challenging for a monkey with average hand-eye coordination.
+</p>
+
+<p>
+Next, we will choose our collection of literature.  The theorem is often used in reference to the complete works of Shakespeare which is certainly a sufficiently large and sophisticated body of literature that we would not normally expect a monkey with a typewriter to be able to replicate.  In addition, Shakespeare's work is available in the public domain in electronic form (see the <a href="#Refs">References</a>).  This enables us to perform some basic statistical analysis of the output text whose probability of occurrence we wish to calculate.
+</p>
+
+<p>
+We will further simplify the monkey's task by adopting very leniant rules regarding the format of the output.  Since we're not so much concerned about the monkey's aesthetic reproduction, we will not require the monkey to match up line breaks or leading spaces, so we will compress multiple whitespace characters into a single space character in our input text.  In addition, we will not make it a requirement that the monkey start with a specific play or poem and continue in some specific order.  We will allow the monkey to reproduce the input texts in any order as long as each text is fully completed before the next one begins.
+</p>
+
+<p>
+Given these conditions, we can now examine the input text.  After downloading and extracting the complete works of Shakespeare, running <a href="shake.py.txt">this python script</a> will produce <a href="shake.out.txt">this output</a>.  The first two lines of the output tell us that there are 5,132,954 total characters in 42 files, and that there are 78 unique characters consisting of letters, digits, and various punctuation marks.  The output also contains a frequency distribution of each character from which we learn, among other things, that the capital letter 'Z' appears 422 times.
+</p>
+
+<p>
+Let's simplify things even further by constructing a unique typewriter solely for our monkey's use.  We will give that typewriter exactly 78 keys, one for each of the possible characters in Shakespeare's work.  The trouble with using an actual keyboard is having to figure out the problems introduced by the caps lock and shift keys.  We'll keep it simple and have a nice keyboard with a one to one correspondence with the actual characters in our input text.  As a reminder, our monkey is really just a random keystroke generator.  The placement of the keys on the typewriter is irrelevant:  our monkey is under strict orders to select one key completely at random every second.
+</p>
+
+<p>
+Given the conditions we have outlined here, the calcuation is straight-forward.  The expected duration of time before observing a match is equal to the reciprocal of the probability that the monkey has typed the first N characters of Shakespeare.  Thus, we would expect a wait of 78 seconds before matching the first character, 78*78 seconds before matching the second, 78*78*78 before matching the third, and so on.  Thus, the expected wait in seconds until our monkey reproduces the complete works of Shakespeare is 78 raised to the power of 5,132,954.  In scientific notation, this is approximately equal to:
+</p>
+
+<pre>
+    3.62e+9712034
+</pre>
+
+<p>
+We would print the entire number here but as you can see, it has nearly 10 milllion digits.  This is an exceedingly large number.  It took 16 hours for our computer to simply evaluate it.  Furthermore, the number is basically a random string of digits, so it doesn't compress very well.  The compressed file is still nearly 5 MB in size.  Space constraints prohibit us from making this file available.  In the <a href="#Refs">References</a>, we describe how you can generate the number for yourself.
+</p>
+
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+
+<!-- begin cbox -->
+<div class="cbox2">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<a name="Refs"></a>
+
+<h2>References</h2>
+
+<p>These two sites provide an excellent starting point for exploring the origins, variations, and controversies associated with the Infinite Monkeys Theorem:</p>
+<ul>
+<li><a href="http://www.everything2.com/index.pl?node_id=39133">http://www.everything2.com/index.pl?node_id=39133</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Infinite_monkey_theorem">http://en.wikipedia.org/wiki/Infinite_monkey_theorem</a></li>
+</ul>
+
+<p>Here is <a href="http://mathforum.org/library/drmath/view/55871.html">an excellent explanation</a> of the calculation, albeit on a smaller scale.</p>
+
+<p>The complete works of <a href="http://www.it.usyd.edu.au/~matty/Shakespeare/">Shakespeare</a> may be downloaded from this site.</p>
+
+<p>This <a href="shake.py.txt">python script</a> will analyze the frequency distribution of Shakespeare's works.  It will produce <a href="shake.out.txt">this output</a>.</p>
+
+<p>You can evaluate 78 raised to the power of 5,132,954 directly, as <code>pow(78,  5132954)</code>.  Python will automatically extend its level of precision to whatever is needed.  However, expressions involving large exponents require exponentially more computations, so you can reduce the time it takes to evaluate this number by using factors.  It's also wise to print the number to a file since the shell may not have the buffering capacity to hold all the digits.</p>
+
+<pre>
+f = open("number_of_seconds.txt", "w")
+a = pow(6,62597)
+b = pow(13,62597)
+c = a * b
+ans = pow(c, 82)
+f.write(str(ans))
+f.close()
+</pre>
+
+<p>Don't wait up.</p>
+    
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+
+
+</div><!-- two -->
+</div><!-- one -->
+</body>
+</html>

@@ -1,0 +1,862 @@
+/* Modeling Program */
+
+libname model 'c:\trash\model';
+
+
+%macro UPDATEINTS(prmtab=&prmtab);
+
+	/*%if &SILENT=N %then %do;
+	    %put ***************************************;
+	    %put *****   Entering macro: UPDATEINTS     ;
+	    %put ***************************************;
+	%end;*/
+
+	/* update const for interactions in the parameters table */
+	%do r=1 %to &ni;
+
+		/* set up a counter for the prmindex for each term */
+		%do s=1 %to &&niterms&r;
+			%let intprmidx&s = 1;
+		%end;
+		
+		/* begin with the first prmidx for the interaction itself */
+		%let pix = 1;
+
+		/* main loop to update for the current interaction pix */
+		%let adv = 1;
+		%do %while (&adv = 1);
+
+			/* get and write the const for the current pix */
+			proc sql noprint;
+
+				/* initialize datasets to store the new const and product */
+				create table model.tmp (newconst num, idx num);
+				create table model.tmp2 (prod num);
+				insert into model.tmp2 (prod) values (1.0);
+
+				/* get the product of each term's contribution to this pix */
+				%do s=1 %to &&niterms&r;
+
+					insert into model.tmp (newconst, idx) 
+						select distinct(const), &s from model.&prmtab.
+                        where varname = "&&intterms&r.x&s"
+						and prmidx = &&intprmidx&s;
+
+					create table model.tmp3 as
+					select a.*, b.* from model.tmp a, model.tmp2 b;
+
+					update model.tmp3 set prod = prod * newconst;
+
+					drop table model.tmp2;
+					create table model.tmp2 as select prod from model.tmp3;
+
+					delete * from model.tmp;
+
+				%end;
+
+				/* update parameters with the const */
+				create table model.tmp4 as
+				select a.*, b.prod from model.&prmtab. a, model.tmp2 b;
+
+				update model.tmp4 set const = prod
+					where varname = "&&intx&r" and prmidx = &pix;
+			quit;
+
+			data model.&prmtab.;
+				set model.tmp4;
+				drop prod;
+			run;
+			proc sql noprint;
+				drop table model.tmp;
+				drop table model.tmp2;
+				drop table model.tmp3;
+			quit;
+
+			/* test whether interaction has another pix */
+			%let adv = 0;
+			%do s=&&niterms&r %to 1 %by -1;
+				%if &adv = 0 %then %do;
+					%let intprmidx&s = %eval(&&intprmidx&s + 1);
+					%let t = &&inttermidx&r.x&s;
+					%if &&intprmidx&s > &&mainpprf&t %then %do;
+						%let intprmidx&s = 1;
+					%end;
+					%else %do;
+						%let adv = 1;
+					%end;
+				%end;
+			%end;
+
+			/* increment pix */
+			%let pix = %eval(&pix+1);
+
+		%end;	/* continue to next pix if one exists (if adv=1) */
+
+	%end;	/* continue to next interaction */
+
+	/*%if &SILENT=N %then %do;
+	    %put ***************************************;
+	    %put *****   Exiting macro: UPDATEINTS      ;
+	    %put ***************************************;
+	%end;*/
+
+%mend; /* UPDATEINTS */
+
+%macro EXPONENTIATE(label=&label);
+
+	/*%if &SILENT=N %then %do;
+	    %put ***************************************;
+	    %put *****   Entering macro: EXPONENTIATE   ;
+	    %put ***************************************;
+	%end;*/
+
+	data model.parameters2;
+		set model.parameters2;
+		prod = param * const;
+	run;
+
+	proc sql noprint;
+		create table model.tmp as
+		select distinct rf as rf, sum(prod) as sum from model.parameters2 group by 1;
+	quit;
+
+	data model.tmp;
+		set model.tmp;
+		expsum = exp(sum);
+	run;
+
+	proc sql noprint;
+		create table model.tmp2 as
+		select sum(expsum) as denom from model.tmp;
+
+        update model.tmp2 set denom = 1.0 + denom;
+
+        create table model.tmp3 as
+        select a.*, b.* from model.tmp a, model.tmp2 b;
+	quit;
+
+	data model.tmp4;
+		set model.tmp3;
+		pct = expsum / denom;
+	run;
+
+	proc sql noprint;
+		insert into model.predpct (setting, rf, pct) 
+			select "&label.", rf, pct from model.tmp4;
+		drop table model.tmp;
+        drop table model.tmp2;
+        drop table model.tmp3;
+        drop table model.tmp4;
+	quit;
+
+	/*%if &SILENT=N %then %do;
+	    %put ***************************************;
+	    %put *****   Exiting macro: EXPONENTIATE    ;
+	    %put ***************************************;
+	%end;*/
+
+%mend;  /* EXPONENTIATE */
+
+
+%macro GETCONSTANTS;
+
+	%if &SILENT=N %then %do;
+	    %put ***************************************;
+	    %put *****   Entering macro: GETCONSTANTS   ;
+	    %put ***************************************;
+	%end;
+
+	%put *****************************************************************;
+	%put * THIS IS NOT BUILT YET, USE WEIGHTING ON RESPONDENT LEVEL      *;
+	%put *****************************************************************;
+
+	/* make backup of original parameters table with sample proportions
+	data model.parameters0;
+		set model.parameters;
+	run;
+
+	/* import the constants file to use
+	proc import out=model.useconstants
+		datafile= "&USECONSTANTS." dbms=excel2000 replace; getnames=yes;
+	run;
+	*/
+
+
+
+
+	%if &SILENT=N %then %do;
+	    %put ***************************************;
+	    %put *****   Exiting macro: GETCONSTANTS    ;
+	    %put ***************************************;
+	%end;
+
+%mend;  /* GETCONSTANTS */
+
+
+
+
+%macro MODEL(ds=&ds, eh=&eh, dvar=&dvar, mainfx=&mainfx, dirfx=&dirfx, intfx=&intfx, exp=&exp);
+
+	option nonotes;
+	%if &SILENT=N %then %do;
+		%put Entering model macro...;
+	%end;
+
+	/* setup the source dataset */
+	data model.ds;
+		set &ds.;
+		&eh.;
+	run;
+
+	/* setup ods captures */
+	ods listing close;
+	ods output ANOVA=model.anova;
+	ods output ConvergenceStatus=model.convergence;
+	ods output DataSummary=model.datasummary;
+	ods output Estimates=model.estimates;
+
+	/* run the model */
+	%if &SILENT=N %then %do;
+		%put Running the model...;
+	%end;
+	proc catmod data=model.ds;
+		direct &dirfx.;
+		model &dvar. = &mainfx. &intfx.		
+		/ml pred=freq nodesign noiter nopredvar noprofile noresponse maxiter=50;
+		response /outest=model.outest out=model.outdata;
+		weight weights;
+	quit;
+	ods listing;
+
+	/* clean up the "outest" dataset of parameters */
+	data model.tmp;
+		set model.outest;
+		if _type_ = 'PARMS';
+		drop _method_ _type_ _name_ _status_;
+	run;
+	proc transpose data=model.tmp out=model.parameters; run;
+	proc sql noprint; drop table model.tmp; quit;
+	data model.parameters;
+		set model.parameters;
+		rename col1 = param;
+	run;
+
+	/* parse main effects */
+	%let i=1;
+	%let xtabselect=;
+	%let xtaborderby=;
+	%let word = %lowcase(%scan(&mainfx, &i, ' '));
+	%do %while (%length(&word) > 0);
+		%let var&i = &word;
+		%let xtabselect = &&xtabselect.&word.,;
+		%let xtaborderby = &&xtaborderby.&i.,;
+		%let i=%eval(&i+1);
+		%let word = %lowcase(%scan(&mainfx, &i, ' '));
+	%end;
+	%let var&i = &dvar;
+	%let nv = &i;
+	%let xtabselect = &&xtabselect.&dvar.,_obs_;
+	%let xtaborderby = &&xtaborderby.&i.,%eval(&i+1);
+
+	/* clean up the "outdata" dataset of frequencies */
+	data model.outdata;
+		set model.outdata;
+		if _type_ = 'FREQ';
+	run;
+
+	/* generate the populations crosstab from outdata */
+	proc sql noprint;
+		create table model.xtab as
+		select distinct &xtabselect. as count
+			from model.outdata
+			order by &xtaborderby. asc;
+	quit;
+
+	/* parse interaction terms */
+	%let i=1;
+	%let word = %lowcase(%scan(&intfx, &i, ' '));
+	%do %while (%length(&word) > 0);
+		%let intx&i = &word;
+		%let i=%eval(&i+1);
+		%let word = %lowcase(%scan(&intfx, &i, ' '));
+	%end;
+	%let ni=%eval(&i-1);
+
+	/* separate interaction terms into their individual components */
+	%do i=1 %to &ni;
+		%let j=1;
+		%let word = %lowcase(%scan(&&intx&i, &j, '*'));
+		%do %while (%length(&word) > 0);
+			%let intterms&i.x&j = &word;
+			%let j=%eval(&j+1);
+			%let word = %lowcase(%scan(&&intx&i, &j, '*'));
+		%end;
+		%let niterms&i=%eval(&j-1);
+	%end;
+
+	/* count the number of discrete levels of each variable */
+	%do i=1 %to &nv;
+		proc sql noprint;
+			select count (distinct &&var&i) into :val&i
+			from model.xtab;
+		quit;
+	%end;
+
+	/* parse direct effects list */
+	%let i=1;
+	%let word = %lowcase(%scan(&dirfx, &i, ' '));
+	%do %while (%length(&word) > 0);
+		%let dirfx&i = &word;
+		%let i=%eval(&i+1);
+		%let word = %lowcase(%scan(&dirfx, &i, ' '));
+	%end;
+	%let ndirfx=%eval(&i-1);
+
+	/* create a direct effects flag for each main effect */
+	%do i=1 %to &nv;
+		%let direct&i = 0;
+		%do j=1 %to &ndirfx;
+			%if &&dirfx&j = &&var&i %then %do;
+				%let direct&i = 1;
+			%end;
+		%end;
+	%end;
+
+	/* count the number of parameters per response function for each main effect */
+	%do i=1 %to &nv;
+		%if &&direct&i = 1 %then %do;
+			%let mainpprf&i = 1;
+		%end;
+		%else %do;
+			%let mainpprf&i = %eval(&&val&i - 1);
+		%end;
+	%end;
+			
+	/* set the number of response functions */
+	%let rf = %eval(&&val&nv - 1);	
+
+	/* count the number of discrete levels and pprf for term in an interaction */
+	/* also store the index (not just the name) of each variable involved in the interaction */
+	%do i=1 %to &ni;
+		%let intpprf&i = 1;
+		%do j=1 %to &&niterms&i;
+			%let k=1;
+			%do %while (&&var&k ne &&intterms&i.x&j);
+				%let k=%eval(&k+1);
+				%if &k > &nv %then %do;
+					%put FATAL ERROR: INTERACTION TERM NOT FOUND: &&intterms&i.x&j;
+					%goto exit;
+				%end;
+			%end;
+			%let intval&i.x&j = &&val&k;
+			%if &&direct&k = 0 %then %do;
+				%let intpprf&i = %eval(&&intpprf&i * %eval(&&intval&i.x&j - 1));
+			%end;
+			%let inttermidx&i.x&j = &k;
+		%end;
+	%end;
+
+	/* write the varname to the corresponding position in the 
+	   dataset of transposed parameters */
+	data model.parameters;
+		set model.parameters;
+		informat varname $32.;
+		format rf 8.0;
+		format varidx 8.0;
+		format prmidx 8.0;
+		varname = .;
+		rf = .;
+		varidx = .;
+		prmidx = .;
+		%let var0 = intercept;
+		%let val0 = 2;
+		%let mainpprf0 = 1;
+		%let idx = 1;
+		%let vix = 1;
+		%do i=0 %to &nv - 1;	/* do for intercept and each iv */
+			%let pix = 1;
+			%do j=1 %to &&mainpprf&i;	/* do for each pprf for this var */
+				%do k=1 %to &rf;			/* do for each rf */
+					if _name_ = "B&idx." then varname = "&&var&i.";
+					if _name_ = "B&idx." then rf = &k;
+					if _name_ = "B&idx." then varidx = &vix;
+					if _name_ = "B&idx." then prmidx = &pix;
+					%let idx=%eval(&idx+1);
+				%end;
+				%let pix=%eval(&pix+1);
+			%end;
+			%let vix=%eval(&vix+1);
+		%end;
+		%do i=1 %to &ni;	/* do for each interaction */
+			%let pix = 1;
+			%do j=1 %to &&intpprf&i;
+				%do k=1 %to &rf;
+					if _name_ = "B&idx." then varname = "&&intx&i.";
+					if _name_ = "B&idx." then rf = &k;
+					if _name_ = "B&idx." then varidx = &vix;
+					if _name_ = "B&idx." then prmidx = &pix;
+					%let idx=%eval(&idx+1);	
+				%end;
+				%let pix=%eval(&pix+1);
+			%end;
+			%let vix=%eval(&vix+1);	
+		%end;
+	run;
+
+	/* get sample proportions for each main effect */
+	data model.sample;
+		format varname $32.;
+		format variter best.;
+		format value best.;
+		format count best.;
+	run;
+
+	proc sql noprint;
+		%do i=1 %to &nv - 1;			
+			create table model.tmp as
+			select distinct &&var&i as value, sum(count) as count, "&&var&i" as varname from model.xtab
+				group by 1;
+			%do j=1 %to &&val&i;
+				select min(value) into :minval from model.tmp;
+				insert into model.sample (varname, variter, value, count)
+					select varname, &j, value, count from model.tmp
+						having value = min(value);
+				delete from model.tmp where value = &minval;
+			%end;
+			drop table model.tmp;		
+		%end;
+	quit;
+
+	/* get total N and proportion for each value in sample table */
+	proc sql noprint;
+		create table model.tmp as select sum(count) as totaln from model.xtab;
+		create table model.tmp2 as
+		select a.*, b.* from model.sample a, model.tmp b;
+	quit;
+	data model.sample;
+		set model.tmp2;
+		if value ne .;
+		prop = count / totaln;
+	run;
+	proc sql noprint;
+		drop table model.tmp;
+		drop table model.tmp2;
+	quit;
+
+	/* get proportion on omitted category */
+	data model.tmp; set model.sample; lastprop = .; run;
+	proc sql noprint;
+		delete * from model.tmp;
+		%do i=1 %to &nv - 1;
+			create table model.tmp2 as
+			select * from model.sample 
+				where varname = "&&var&i" having value = max(value);
+
+			alter table model.tmp2 add lastprop num;
+			update model.tmp2 set lastprop = prop;
+			
+			insert into model.tmp
+			select a.*, b.lastprop from model.sample a, model.tmp2 b
+				where a.varname = b.varname;
+		%end;
+	quit;
+
+	data model.sample; 
+		set model.tmp;
+		omitprop = prop - lastprop;
+		drop lastprop;
+	run;
+	proc sql noprint;
+		drop table model.tmp2;
+		drop table model.tmp;
+	quit;
+
+	/* setup overall sample constants to store with parameters */
+	data model.parameters;
+		set model.parameters;
+		if varname = "intercept" then const = 1.0;
+	run;
+
+	/* update parameters table for each main effect */
+	%do i=1 %to &nv - 1;
+
+		/* store the mean for direct effects */
+		%if &&direct&i = 1 %then %do;
+
+			proc sql noprint;
+				create table model.tmp as
+				select sum(value * count) as sum from model.sample
+					where varname = "&&var&i";
+
+				create table model.tmp2 as
+				select distinct(totaln) as totaln from model.sample;
+
+				create table model.tmp3 as
+				select a.sum, b.totaln from model.tmp a, model.tmp2 b;
+
+				alter table model.tmp3 add mean num;
+				update model.tmp3 set mean = sum / totaln;
+
+				create table model.tmp4 as
+				select a.*, b.mean from model.parameters a, model.tmp3 b;
+
+				update model.tmp4 set const = mean 
+					where varname = "&&var&i";
+
+			quit;
+
+			data model.parameters;
+				set model.tmp4;
+				drop mean; 
+			run;
+			proc sql noprint;
+				drop table model.tmp;
+				drop table model.tmp2;
+				drop table model.tmp3;
+				drop table model.tmp4;
+			quit;
+
+		%end;
+
+		/* store the omitted proportion for categorical effects */
+		%else %do;
+
+			%do j=1 %to &&val&i - 1;
+				proc sql noprint;
+					create table model.tmp as
+					select omitprop from model.sample
+						where varname = "&&var&i" and variter = &j;
+
+					create table model.tmp2 as
+					select a.*, b.omitprop from model.parameters a, model.tmp b;
+
+					update model.tmp2 set const = omitprop
+						where varname = "&&var&i" and prmidx = &j;
+				quit;
+
+				data model.parameters;
+					set model.tmp2;
+					drop omitprop; 
+				run;
+				proc sql noprint;
+					drop table model.tmp;
+					drop table model.tmp2;
+				quit;
+
+			%end;
+		%end;
+	%end;
+
+    /* update the interaction terms in the parameters table */
+    %UPDATEINTS(prmtab=parameters);
+
+	
+	/* build external constants if passed as an option */
+	%if %length(&USECONSTANTS) > 1 %then %do;
+		%GETCONSTANTS;
+	%end;	
+
+
+	/* setup predicted percentages table */
+	data model.predpct;
+		format setting $255.;
+		format rf best.;
+		format pct best.;
+	run;
+
+
+	%if &MODELONLY=Y %then %goto exit;
+
+
+	/* exponentiate at overall sample settings */
+	%if &SILENT=N %then %do;
+		%put Starting exponentiation of main effects...;
+	%end;
+    data model.parameters2;
+        set model.parameters;
+    run;
+    %EXPONENTIATE(label=Overall);
+
+	/* exponentiate for each main effect */
+	%do i=1 %to &nv - 1;
+		
+		/* for each of this variable's values */
+		%do j=1 %to &&val&i;
+
+            /* handle categorical effects */
+            %if &&direct&i = 0 %then %do;
+
+    			/* build full-rank center-point parameterization */
+    			%if &j = &&val&i %then 
+    				%do;
+    					%do k=1 %to &&val&i - 1;
+    						%let frcp&k = -1;
+    					%end;
+    				%end;
+    			%else %do;
+    				%do k=1 %to &j - 1;
+    					%let frcp&k = 0;
+    				%end;
+    				%let frcp&j = 1;
+    				%do k=%eval(&j+1) %to &&val&i - 1;
+    					%let frcp&k = 0;
+    				%end;
+    			%end;
+
+            %end;
+
+            /* handle direct effects */
+            %else %do;
+                
+                /* get the jth value of the direct var */
+                proc sql noprint;
+                    select value into :cvalue from model.sample
+                        where varname = "&&var&i" and variter = &j;
+                quit;
+
+                /* set the only frcp index used */
+                %let frcp1 = &cvalue;
+
+            %end;
+
+			/* start with a fresh copy of the parameters table */
+			data model.parameters2; 
+                set model.parameters; 
+            run;
+
+			/* do for each parameter corresponding to this variable */
+			%do k=1 %to &&mainpprf&i;
+				proc sql noprint;
+					update model.parameters2 set const = &&frcp&k
+						where varname = "&&var&i" and prmidx = &k;
+				quit;
+			%end;
+
+			/* update interactions the same way they were originally defined */
+            %UPDATEINTS(prmtab=parameters2);
+
+			/* set the label */
+			proc sql noprint;
+				select value into :cvalue from model.sample
+					where varname = "&&var&i" and variter = &j;
+			quit;
+			%let cvalue = %left(%trim(&cvalue));
+			%let newlabel = &&var&i.=&cvalue.; 
+
+			/* exponentiate */                       
+            %EXPONENTIATE(label=%quote(&newlabel));
+			%if &SILENT=N %then %do;
+				%put Done - &newlabel.;
+			%end;
+
+		%end;	/* continue to next value of current variable */
+
+	%end;	/* continue to next main effect */
+
+
+	%if &EXPINTS=N %then %goto makepredpct;
+
+
+	/* exponentiate for each interaction combo */
+	%if &SILENT=N %then %do;
+		%put Starting exponentiation of interactions...;
+	%end;
+
+	/* do for each interaction */
+	%do i=1 %to &ni;
+
+		/* set up a counter for the prmindex for each term */
+		%do j=1 %to &&niterms&i;
+			%let intcolidx&j = 1;
+		%end;
+		
+		/* set up a flag that is true as long as more combinations exist */
+		%let iadv = 1;
+		%do %while (&iadv = 1);
+
+			/* start with a fresh copy of the parameters table */
+			data model.parameters2; 
+                set model.parameters; 
+            run;
+
+			/* clear the label */
+			%let newlabel=;
+
+			/* do for each term in the interaction */
+			%do j=1 %to &&niterms&i;
+								
+	            /* handle categorical effects */
+	            %if &&&&direct&&inttermidx&i.x&j = 0 %then %do;
+
+	    			/* build full-rank center-point parameterization */
+	    			%if &&intcolidx&j = &&&&val&&inttermidx&i.x&j %then 
+	    				%do;
+	    					%do k=1 %to &&&&val&&inttermidx&i.x&j - 1;
+	    						%let frcp&k = -1;
+	    					%end;
+	    				%end;
+	    			%else %do;
+	    				%do k=1 %to &&intcolidx&j - 1;
+	    					%let frcp&k = 0;
+	    				%end;
+	    				%let frcp&&intcolidx&j = 1;
+	    				%do k=%eval(&&intcolidx&j+1) %to &&&&val&&inttermidx&i.x&j - 1;
+	    					%let frcp&k = 0;
+	    				%end;
+	    			%end;
+
+	            %end;
+
+	            /* handle direct effects */
+	            %else %do;
+	                
+	                /* get the current value of the direct var */
+	                proc sql noprint;
+	                    select value into :cvalue from model.sample
+	                        where varname = "&&intterms&i.x&j" and variter = &&intcolidx&j;
+	                quit;
+
+	                /* set the only frcp index used */
+	                %let frcp1 = &cvalue;
+
+	            %end;
+
+				/* update parameters corresponding to this variable */
+				%do k=1 %to &&&&mainpprf&&inttermidx&i.x&j;
+					proc sql noprint;
+						update model.parameters2 set const = &&frcp&k
+							where varname = "&&intterms&i.x&j" and prmidx = &k;
+					quit;
+				%end;
+
+				/* add to the label */
+				proc sql noprint;
+					select value into :cvalue from model.sample
+						where varname = "&&intterms&i.x&j" and variter = &&intcolidx&j;
+				quit;
+				%let cvalue = %left(%trim(&cvalue));
+				%if &j < &&niterms&i %then %do;
+					%let cvalue = &cvalue,;
+				%end;
+				%let newlabel = &newlabel &&intterms&i.x&j=&cvalue. ;
+
+			%end;	/* continue to next term in the interaction */
+
+
+			/* update interactions constants */
+            %UPDATEINTS(prmtab=parameters2);
+
+			/* exponentiate for this combo */
+			%EXPONENTIATE(label=%quote(&newlabel));		
+			%if &SILENT=N %then %do;
+				%put Done - &newlabel.;
+			%end;	
+
+			/* determine whether another combination exists */
+			%let iadv = 0;
+			%do j=&&niterms&i %to 1 %by -1;
+				%if &iadv = 0 %then %do;
+					%let intcolidx&j = %eval(&&intcolidx&j + 1);
+					%let k = &&inttermidx&i.x&j;
+					%if &&intcolidx&j > &&val&k %then %do;
+						%let intcolidx&j = 1;
+					%end;
+					%else %do;
+						%let iadv = 1;
+					%end;
+				%end;
+			%end;
+
+		%end;	/* continue to next interaction combo */
+
+	%end;	/* continue to next interaction */
+
+	/* exponentiate any custom combinations passed in the exp parameter */
+	%if %length(&exp) > 1 %then %do;
+
+		%if &SILENT=N %then %do;
+			%put Starting exponentiation of custom combinations...;
+		%end;
+
+		/* I would start this, but this hasn't been built yet! */
+
+
+
+
+	%end;	/* done with custom exponentiation */	
+
+		
+%makepredpct:
+
+	/* format predpct for output, de-interleave */
+	%if &SILENT=N %then %do;
+		%put Cleaning up and saving out...;
+	%end;
+
+	data model.predpct;
+		set model.predpct;
+		if pct ^= .;
+	run;
+
+	%do i=1 %to &rf;
+		data model.tmp&i.;
+			set model.predpct;
+			if rf = &i.;
+			pct&i. = pct;
+			drop rf pct;
+		run;
+	%end;
+
+	data model.ptmp;
+		set model.tmp1;
+	run;
+
+	proc sql noprint;
+		%do i=2 %to &rf;
+			create table model.ptmp as
+			select a.*, b.pct&i. from model.ptmp a, model.tmp&i. b 
+				where a.setting = b.setting;
+		%end;
+	quit;
+
+	data model.predpct;
+		set model.ptmp;
+	run;
+
+	proc sql noprint;
+		%do i=1 %to &rf;
+			drop table model.tmp&i.;
+		%end;
+		drop table model.ptmp;
+	quit;
+		
+
+	%if &SAVEOUT=N %then %goto exit;
+
+
+	/* save to excel */
+	proc export data=model.predpct outfile="c:\trash\model-&dvar.-predict.xls" dbms=excel2000 replace; run;
+	proc export data=model.anova outfile="c:\trash\model-&dvar.-anova.xls" dbms=excel2000 replace; run;
+	proc export data=model.convergence outfile="c:\trash\model-&dvar.-converge.xls" dbms=excel2000 replace; run;
+	proc export data=model.datasummary outfile="c:\trash\model-&dvar.-summary.xls" dbms=excel2000 replace; run;
+	proc export data=model.estimates outfile="c:\trash\model-&dvar.-anovaest.xls" dbms=excel2000 replace; run;
+
+
+%exit:
+
+	%if &SILENT=N %then %do;
+		%put Model macro complete.;
+	%end;
+
+option notes;
+%mend; /* MODEL */
+
+/* SET GLOBAL OPTIONS */
+%let SILENT=Y;			/* Y or N */
+%let MODELONLY=N;		/* Y=Run model only, no exponentiation, no excel output, N=do all */
+%let EXPINTS=Y;			/* Y=Include exponentiation of interaction combos, N=skip ints. */
+%let USECONSTANTS=;		/* leave blank, or specify an excel file with varname,value,prop */
+%let SAVEOUT=Y;			/* Y=make excel files, N=don't */
+
+
+

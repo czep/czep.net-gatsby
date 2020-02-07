@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css" media="all">@import url("../main.css");</style>
+<style type="text/css" media="all">
+    table {
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid black;
+    }
+    caption {
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: bold;
+        margin-top: 1em;
+    }
+    tr, th, td {
+        margin: 10px;
+        border: 1px solid black;
+    }
+    th, td {
+        text-align: center;
+    }
+    .cbox2 .e .content {
+        padding: 0 46px 0 30px;
+    }
+    pre {
+        margin: 1em 0 1em 0;
+        padding: 1em;
+        border: 1px solid #555;
+    }
+</style>
+<title>Stat Resources</title>
+</head>
+
+<body>
+<div id="one" style="background: #fff;">
+<div id="two">
+
+<h1>Stat Resources</h1>
+
+<!-- begin cbox -->
+<div class="cbox2">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Resources in Statistical Programming</h2>
+
+<p>
+This page describes tools, documentation, and research papers I have written in the area of statistics and statistical programming.
+</p>
+
+<h3><a href="mlelr.html">Paper: Maximum Likelihood Estimation of Logistic Regression Models</a></h3>
+
+<p style="margin-left: 4em;">
+Built upon the theory of generalized linear models, logistic regression has proven to be one of the most versatile techniques used to model the outcomes of a categorical dependent variable.  This paper presents a mathematical introduction to the logistic regression model, beginning with the binomial case and then generalizing to the multinomial case.  This is followed by discussion of maximum likelihood estimation and a generic implementation of an algorithm used to estimate logistic regression models.
+</p>
+<p>
+Update!  I have completed and released the source code for mlelr, along with a detailed description of how the code works.
+</p>
+
+
+<h3><a href="netflix.sas.txt">SAS Code to Import Netflix Prize data</a></h3>
+<p style="margin-left: 4em;">
+Netflix is offering one million dollars to anyone who can build a recommender system that is 10% better than theirs.  Register at netflixprize.com.  I'm rooting for the SAS user community here so I'm sharing code to import the Netflix datafiles into SAS datasets.  The code is well-tuned and correct as far as I know.  If anyone spots a bug or has a problem, feel free to write to me or post to the prize forum.  I'm off to the ACM Library to catch up on about 15 years of research.  Good luck!
+</p>
+
+<h3><a href="model-5.sas.txt">A SAS Macro to automate the evaluation of logisitic regression equations</a></h3>
+
+<p style="margin-left: 4em;">
+This is a SAS Macro that automatically evaluates the predicted probabilities for all independent variable value combinations resulting from a model estimated using <code>proc catmod</code>.  This is free software, and I apologize that it is not neatly packaged.  It will likely require some modifications to run on your system.  Soon, I plan to more fully document its features and provide a textbook example showing its use. 
+</p>
+
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+</div><!-- two -->
+</div><!-- one -->
+</body>
+</html>

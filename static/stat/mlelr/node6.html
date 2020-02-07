@@ -1,0 +1,378 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The Newton-Raphson Method</TITLE>
+<META NAME="description" CONTENT="The Newton-Raphson Method">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="next" HREF="node7.html">
+<LINK REL="previous" HREF="node5.html">
+<LINK REL="up" HREF="node3.html">
+<LINK REL="next" HREF="node7.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html89"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html87"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html81"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html90"
+  HREF="node7.html">Caveats</A>
+<B> Up:</B> <A NAME="tex2html88"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html82"
+  HREF="node5.html">Parameter Estimation</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00021300000000000000">
+The Newton-Raphson Method</A>
+</H3>
+Setting the equations in Eq.&nbsp;<A HREF="node5.html#eq:first-deriv">11</A> equal to zero results in a system of <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> nonlinear equations each with <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> unknown variables.  The solution to the system is a vector with elements, <IMG
+ WIDTH="22" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img44.png"
+ ALT="$ \beta_k$">.  After verifying that the matrix of second partial derivatives is negative definite, and that the solution is the global maximum rather than a local maximum, then we can conclude that this vector contains the parameter estimates for which the observed data would have the highest probability of occurrence.  However, solving a system of nonlinear equations is not easy--the solution cannot be derived algebraically as it can in the case of linear equations.  The solution must be numerically estimated using an iterative process.  Perhaps the most popular method for solving systems of nonlinear equations is Newton's method, also called the Newton-Raphson method.
+
+<P>
+Newton's method begins with an initial guess for the solution then uses the first two terms of the Taylor polynomial evaluated at the initial guess to come up with another estimate that is closer to the solution.  This process continues until it converges (hopefully) to the actual solution.  Recall that the Taylor polynomial of degree <IMG
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img66.png"
+ ALT="$ n$"> for <IMG
+ WIDTH="15" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img67.png"
+ ALT="$ f$"> at the point <IMG
+ WIDTH="55" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img68.png"
+ ALT="$ x = x_0$"> is defined as the first <IMG
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img66.png"
+ ALT="$ n$"> terms of the Taylor series for <IMG
+ WIDTH="15" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img67.png"
+ ALT="$ f$">:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:Taylor-1"></A><!-- MATH
+ \begin{equation}
+\sum_{i=0}^n \frac{f^{(i)} (x_0)}{i!} (x - x_0)^i
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="161" HEIGHT="67" ALIGN="MIDDLE" BORDER="0"
+ SRC="img69.png"
+ ALT="$\displaystyle \sum_{i=0}^n \frac{f^{(i)} (x_0)}{i!} (x - x_0)^i$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(17)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+provided that the first <IMG
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img66.png"
+ ALT="$ n$"> derivatives of <IMG
+ WIDTH="15" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img67.png"
+ ALT="$ f$"> at <IMG
+ WIDTH="22" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img70.png"
+ ALT="$ x_0$"> all exist.  The first degree Taylor polynomial is also the equation for the line tangent to <IMG
+ WIDTH="15" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img67.png"
+ ALT="$ f$"> at the point <!-- MATH
+ $(x_0, f(x_0))$
+ -->
+<IMG
+ WIDTH="85" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img71.png"
+ ALT="$ (x_0, f(x_0))$">.  The point at which the tangent line crosses the x-axis, <IMG
+ WIDTH="52" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img72.png"
+ ALT="$ (x_1, 0)$">, is used in the next approximation of the root to be found where <IMG
+ WIDTH="70" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img73.png"
+ ALT="$ f(x) = 0$">.  The first step in Newton's method is to take the first degree Taylor polynomial as an approximation for <IMG
+ WIDTH="15" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img67.png"
+ ALT="$ f$">, which we want to set equal to zero:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:Taylor-2"></A><!-- MATH
+ \begin{equation}
+f(x_0) + f^{\prime}(x_0) \cdot (x - x_0) = 0
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="220" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.png"
+ ALT="$\displaystyle f(x_0) + f^{\prime}(x_0) \cdot (x - x_0) = 0$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(18)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Solving for <IMG
+ WIDTH="14" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img75.png"
+ ALT="$ x$">, we have:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:Taylor-3"></A><!-- MATH
+ \begin{equation}
+x = x_0 - \frac{f(x_0)}{f^{\prime}(x_0)}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="126" HEIGHT="58" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.png"
+ ALT="$\displaystyle x = x_0 - \frac{f(x_0)}{f^{\prime}(x_0)}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(19)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+This new value of <IMG
+ WIDTH="14" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img75.png"
+ ALT="$ x$"> is the next approximation for the root.  We let <IMG
+ WIDTH="55" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img77.png"
+ ALT="$ x_1 = x$"> and continue in the same manner to generate <!-- MATH
+ $x_2, x_3, \ldots$
+ -->
+<IMG
+ WIDTH="75" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img78.png"
+ ALT="$ x_2, x_3, \ldots$">, until successive approximations converge.
+
+<P>
+Generalizing Newton's method to a system of equations is not difficult.  In our case, the equations whose roots we want to solve are those in Eq.&nbsp;<A HREF="node5.html#eq:first-deriv">11</A>, the first derivative of the log-likelihood function.  Since Eq.&nbsp;<A HREF="node5.html#eq:first-deriv">11</A> is actually a system of <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> equations whose roots we want to find simultaneously, it is more convenient to use matrix notation to express each step of the Newton-Raphson method.  We can write Eq.&nbsp;<A HREF="node5.html#eq:first-deriv">11</A> as <!-- MATH
+ $l^{\prime}(\boldsymbol{\beta})$
+ -->
+<IMG
+ WIDTH="40" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img79.png"
+ ALT="$ l^{\prime}(\boldsymbol{\beta})$">.  Let <!-- MATH
+ $\boldsymbol{\beta}^{(0)}$
+ -->
+<IMG
+ WIDTH="35" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img80.png"
+ ALT="$ \boldsymbol{\beta}^{(0)}$"> represent the vector of initial approximations for each <IMG
+ WIDTH="22" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img44.png"
+ ALT="$ \beta_k$">, then the first step of Newton-Raphson can be expressed as:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:NR-1"></A><!-- MATH
+ \begin{equation}
+\boldsymbol{\beta}^{(1)} = \boldsymbol{\beta}^{(0)} + [-l^{\prime\prime}(\boldsymbol{\beta}^{(0)})]^{-1} \cdot l^{\prime}(\boldsymbol{\beta}^{(0)})
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="274" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img81.png"
+ ALT="$\displaystyle \boldsymbol{\beta}^{(1)} = \boldsymbol{\beta}^{(0)} + [-l^{\prime\prime}(\boldsymbol{\beta}^{(0)})]^{-1} \cdot l^{\prime}(\boldsymbol{\beta}^{(0)})$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(20)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+Let <!-- MATH
+ $\boldsymbol{\mu}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img82.png"
+ ALT="$ \boldsymbol{\mu}$"> be a column vector of length <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$"> with elements <!-- MATH
+ $\mu_i = n_i \pi_i$
+ -->
+<IMG
+ WIDTH="75" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img83.png"
+ ALT="$ \mu_i = n_i \pi_i$">.  Note that each element of <!-- MATH
+ $\boldsymbol{\mu}$
+ -->
+<IMG
+ WIDTH="17" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img82.png"
+ ALT="$ \boldsymbol{\mu}$"> can also be written as <!-- MATH
+ $\mu_i = E(y_i)$
+ -->
+<IMG
+ WIDTH="85" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img84.png"
+ ALT="$ \mu_i = E(y_i)$">, the expected value of <IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img85.png"
+ ALT="$ y_i$">.  Using matrix multiplication, we can show that:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:first-deriv-mx"></A><!-- MATH
+ \begin{equation}
+l^{\prime}(\boldsymbol{\beta}) = \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="150" HEIGHT="40" ALIGN="MIDDLE" BORDER="0"
+ SRC="img86.png"
+ ALT="$\displaystyle l^{\prime}(\boldsymbol{\beta}) = \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(21)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+is a column vector of length <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> whose elements are <!-- MATH
+ $\frac{\partial l(\beta)}{\partial \beta_k}$
+ -->
+<IMG
+ WIDTH="39" HEIGHT="45" ALIGN="MIDDLE" BORDER="0"
+ SRC="img87.png"
+ ALT="$ \frac{\partial l(\beta)}{\partial \beta_k}$">, as derived in Eq.&nbsp;<A HREF="node5.html#eq:first-deriv">11</A>.  Now, let <!-- MATH
+ $\boldsymbol{W}$
+ -->
+<IMG
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img88.png"
+ ALT="$ \boldsymbol{W}$"> be a square matrix of order <IMG
+ WIDTH="20" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.png"
+ ALT="$ N$">, with elements <!-- MATH
+ $n_i\pi_i(1-\pi_i)$
+ -->
+<IMG
+ WIDTH="94" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img89.png"
+ ALT="$ n_i\pi_i(1-\pi_i)$"> on the diagonal and zeros everywhere else.  Again, using matrix multiplication, we can verify that
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:2nd-deriv-mx"></A><!-- MATH
+ \begin{equation}
+l^{\prime\prime}(\boldsymbol{\beta}) = - \boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="149" HEIGHT="40" ALIGN="MIDDLE" BORDER="0"
+ SRC="img90.png"
+ ALT="$\displaystyle l^{\prime\prime}(\boldsymbol{\beta}) = - \boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(22)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+is a <!-- MATH
+ $K+1 \times K+1$
+ -->
+<IMG
+ WIDTH="118" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img91.png"
+ ALT="$ K+1 \times K+1$"> square matrix with elements <!-- MATH
+ $\frac{\partial^2 l(\beta)}{\partial \beta_k \partial\beta_{k^\prime}}$
+ -->
+<IMG
+ WIDTH="58" HEIGHT="47" ALIGN="MIDDLE" BORDER="0"
+ SRC="img92.png"
+ ALT="$ \frac{\partial^2 l(\beta)}{\partial \beta_k \partial\beta_{k^\prime}}$">.  Now, Eq.&nbsp;<A HREF="#eq:NR-1">20</A> can be written:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:NR-2"></A><!-- MATH
+ \begin{equation}
+\boldsymbol{\beta}^{(1)} = \boldsymbol{\beta}^{(0)} + [\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}]^{-1} \cdot \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="304" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img93.png"
+ ALT="$\displaystyle \boldsymbol{\beta}^{(1)} = \boldsymbol{\beta}^{(0)} + [\boldsymbo...
+...}\boldsymbol{X}]^{-1} \cdot \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(23)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+Continue applying Eq.&nbsp;<A HREF="#eq:NR-2">23</A> until there is essentially no change between the elements of <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> from one iteration to the next.  At that point, the maximum likelihood estimates are said to have converged, and Eq.&nbsp;<A HREF="#eq:2nd-deriv-mx">22</A> will hold the variance-covariance matrix of the estimates.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html89"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html87"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html81"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html90"
+  HREF="node7.html">Caveats</A>
+<B> Up:</B> <A NAME="tex2html88"
+  HREF="node3.html">Binomial Logistic Regression</A>
+<B> Previous:</B> <A NAME="tex2html82"
+  HREF="node5.html">Parameter Estimation</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

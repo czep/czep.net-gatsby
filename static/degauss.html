@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css" media="all">@import url(main.css);</style>
+<script language="JavaScript" type="text/javascript">
+<!--
+    function stamp(d) {
+        var txt = "Current as of: " + d.toLocaleString();
+        document.write(txt);    
+    }
+    function cbox_over(id) {
+        if (document.getElementById) {
+            document.getElementById(id).className = "cbox2";
+        }        
+    }
+    function cbox_out(id) {
+        if (document.getElementById) {
+            document.getElementById(id).className = "cbox";
+        }
+    }
+    function cbox_down(id) {
+        if (document.getElementById) {
+            document.getElementById(id).className = "cbox3";            
+        }
+    }
+    function init() {
+        var elems = document.getElementsByTagName("a");
+        var A = new Array;
+        var n = 0;
+        for (var i = 0; i < elems.length; i++) {
+            if (elems[i].className == "menulink") {
+                A[n++] = elems[i];
+            }
+        }
+        for (i = 0; i < n; i++) {
+            var txt = A[i].innerHTML;
+            A[i].parentNode.innerHTML = txt;
+        }    
+    }
+-->
+</script>
+<style type="text/css" media="all">
+    /* override cbox */
+    .menuwrap {
+        margin: 0 0 1em 1em;
+        padding: 0;
+        width: 100%;
+        float: left;
+        clear: both;
+    }
+    .cboxwrap {
+        margin: 0 2.5% 0.5em 0;
+        padding: 0;
+        width: 45%;
+        height: 12em;
+        overflow: hidden;
+        float: left;
+    }
+    .cbox, .cbox2, .cbox3 {
+        margin: 1em 0 1em 0;
+        padding: 0;
+        width: 100%;
+        float: left; 
+        cursor: pointer;   
+    }
+    .cbox .e .content, .cbox2 .e .content {
+        height: 8em;
+        overflow: hidden;
+    }
+    .cbox3 .e .content {
+        height: 8em;
+        overflow: hidden;
+    }
+    .cbox a:link, .cbox2 a:link, .cbox3 a:link {
+        font-weight: normal;
+        text-decoration: none;
+        color: #000;
+    }
+    .cbox a:visited, .cbox2 a:visited, .cbox3 a:visited {
+        font-weight: normal;
+        text-decoration: none;
+        color: #000;
+    }
+    .cbox a:hover, .cbox2 a:hover, .cbox3 a:hover {
+        font-weight: normal;
+        text-decoration: none;
+        color: #000;
+    }
+    .cbox a:active, .cbox2 a:active, .cbox3 a:active {
+        font-weight: normal;
+        text-decoration: none;
+        color: #000;
+    }
+
+</style>
+<title> ]] c z e p [[ </title>
+</head>
+
+<body onload="init()">
+<div id="one">
+<div id="two">
+
+<a href="http://czep.net/"><img src="img/czep.jpg" alt="czep" style="margin-left: -3px;" /></a>
+
+<div id="mainbann">
+
+<h1>degauss your monitor now</h1>
+
+</div><!-- mainbann -->
+
+
+<div class="menuwrap">
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb1" onmouseover="cbox_over('cb1');" onmouseout="cbox_out('cb1');" onmousedown="cbox_down('cb1');" onmouseup="cbox_over('cb1'); window.location='data/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Social Science Data Analysis</h2>
+<p><a class="menulink" href="data/">Useful information for researchers working with the Census, Current Population Survey, and General Social Survey datasets.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb2" onmouseover="cbox_over('cb2');" onmouseout="cbox_out('cb2');" onmousedown="cbox_down('cb2');" onmouseup="cbox_over('cb2'); window.location='stat/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Statistical Methods</h2>
+<p><a class="menulink" href="stat/">An article on Maximum Likelihood Estimation of Logistic Regression Models.  Additional articles are in progress.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb3" onmouseover="cbox_over('cb3');" onmouseout="cbox_out('cb3');" onmousedown="cbox_down('cb3');" onmouseup="cbox_over('cb3'); window.location='weblog/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Weblog</h2>
+<p><a class="menulink" href="weblog/">Semi-occassionally updated collection of socio-cultural critiques, ramblings and ruminations on all manner of various topics.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb4" onmouseover="cbox_over('cb4');" onmouseout="cbox_out('cb4');" onmousedown="cbox_down('cb4');" onmouseup="cbox_over('cb4'); window.location='contact/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Contact</h2>
+<p><a class="menulink" href="contact/">Send me an email using a plain vanilla webform.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb5" onmouseover="cbox_over('cb5');" onmouseout="cbox_out('cb5');" onmousedown="cbox_down('cb5');" onmouseup="cbox_over('cb5'); window.location='visual/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Photographic Experiments</h2>
+<p><a class="menulink" href="visual/">A couple of nice pieces dating to an era during which I fancied meself an artiste.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb6" onmouseover="cbox_over('cb6');" onmouseout="cbox_out('cb6');" onmousedown="cbox_down('cb6');" onmouseup="cbox_over('cb6'); window.location='retard/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Audio philistinism</h2>
+<p><a class="menulink" href="retard/">Against the notion that I could have been a rock star, this section brings together common pieces on the music I can't live without.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb7" onmouseover="cbox_over('cb7');" onmouseout="cbox_out('cb7');" onmousedown="cbox_down('cb7');" onmouseup="cbox_over('cb7'); window.location='site/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Site Notes and Credits</h2>
+<p><a class="menulink" href="site/">Links to source and inspirational credits for the design of this site, as well as some historical background.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb8" onmouseover="cbox_over('cb8');" onmouseout="cbox_out('cb8');" onmousedown="cbox_down('cb8');" onmouseup="cbox_over('cb8'); window.location='html_skool/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>HTML Skool</h2>
+<p><a class="menulink" href="html_skool/">Learning CSS is like starting kindergarten all over again.  Here are some tidbits I have created to share with all.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb9" onmouseover="cbox_over('cb9');" onmouseout="cbox_out('cb9');" onmousedown="cbox_down('cb9');" onmouseup="cbox_over('cb9'); window.location='quicksilver/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Quicksilver</h2>
+<p><a class="menulink" href="quicksilver/">A bike messenger simulation game illustrating nearest neighbor search using PMR Quadtrees and Dijkstra's shortest path.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+<div class="cboxwrap">
+<!-- begin cbox -->
+<div class="cbox" id="cb10" onmouseover="cbox_over('cb10');" onmouseout="cbox_out('cb10');" onmousedown="cbox_down('cb10');" onmouseup="cbox_over('cb10'); window.location='about/';">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>About</h2>
+<p><a class="menulink" href="about/">Shameless self-promotion.</a></p>
+
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+</div><!-- cboxwrap -->
+
+
+</div><!-- menuwrap -->
+
+
+<div id="footer">
+<img src="img/s420.png" alt="south-420 productions" />
+<div id="timestamp"><script language="JavaScript" type="text/javascript">stamp(new Date())</script></div>
+
+</div><!-- footer -->
+
+<!-- preload -->
+<img src="img/corners/s2/ccf/c.gif" alt=" " style="display: none;" />
+<img src="img/corners/s2/ccf/n.gif" alt=" " style="display: none;" />
+<img src="img/corners/s2/ccf/nw.gif" alt=" " style="display: none;" />
+<img src="img/corners/s2/ccf/ne.gif" alt=" " style="display: none;" />
+<img src="img/corners/s2/ccf/w.gif" alt=" " style="display: none;" />
+<img src="img/corners/s2/ccf/e.gif" alt=" " style="display: none;" />
+<img src="img/corners/s2/ccf/s.gif" alt=" " style="display: none;" />
+<img src="img/corners/s2/ccf/sw.gif" alt=" " style="display: none;" />
+<img src="img/corners/s2/ccf/se.gif" alt=" " style="display: none;" />
+
+<img src="img/corners/s3/ccf/c.gif" alt=" " style="display: none;" />
+<img src="img/corners/s3/ccf/n.gif" alt=" " style="display: none;" />
+<img src="img/corners/s3/ccf/nw.gif" alt=" " style="display: none;" />
+<img src="img/corners/s3/ccf/ne.gif" alt=" " style="display: none;" />
+<img src="img/corners/s3/ccf/w.gif" alt=" " style="display: none;" />
+<img src="img/corners/s3/ccf/e.gif" alt=" " style="display: none;" />
+<img src="img/corners/s3/ccf/s.gif" alt=" " style="display: none;" />
+<img src="img/corners/s3/ccf/sw.gif" alt=" " style="display: none;" />
+<img src="img/corners/s3/ccf/se.gif" alt=" " style="display: none;" />
+
+</div><!-- two -->
+</div><!-- one -->
+</body>
+</html>

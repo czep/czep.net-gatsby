@@ -1,0 +1,399 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css" media="all">@import url(../main.css);</style>
+<style type="text/css" media="all">
+    table {
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid black;
+    }
+    caption {
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: bold;
+        margin-top: 1em;
+    }
+    tr, th, td {
+        margin: 10px;
+        border: 1px solid black;
+    }
+    th, td {
+        text-align: center;
+    }
+    .cbox2 .e .content {
+        padding: 0 46px 0 30px;
+    }
+    pre {
+        margin: 1em 0 1em 0;
+        padding: 1em;
+        border: 1px solid #555;
+    }
+</style>
+<title>Dataset Aggregation and Transposition</title>
+</head>
+
+<body>
+<div id="one">
+<div id="two">
+
+
+<h1>Dataset Aggregation and Transposition</h1>
+
+<!-- begin cbox -->
+<div class="cbox2">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Introduction</h2>
+
+<p>
+This paper explores some common ways to transform datasets using aggregation, disaggregation, and transposition techniques.  The examples here are simplistic, but they represent basic transformation problems that researchers are likely to encounter.  Emphasis is on using SAS and SPSS to transform datasets, with some discussion on the benefits and limits to working in an SQL based environment.
+</p>
+
+<br />
+
+<h2>Aggregation</h2>
+
+<p>
+In its most basic form, an aggregated dataset is simply a table of the counts of records that share a unique combination of variable values.  In Table 1, there are two variables of interest followed by a column of counts representing the number of records that share the same profile.  Thus, there are 2 records having values of "1" for both var1 and var2, 1 record having a value of "1" for var1 and "2" for var2, and so on.
+</p>
+
+<table>
+<caption>Table 1: Aggregated Dataset</caption>
+<tr><th>var1</th><th>var2</th><th>count</th></tr>
+<tr><td>1</td><td>1</td><td>2</td></tr>
+<tr><td>1</td><td>2</td><td>1</td></tr>
+<tr><td>2</td><td>1</td><td>3</td></tr>
+<tr><td>2</td><td>2</td><td>4</td></tr>
+</table>
+
+<p>
+Aggregated datasets are often used as the input to statistical procedures.  For example, the design matrix used in many regression-based procedures usually takes the form of an aggregated dataset.  As a result, aggregated datasets are often referred to as population profiles.  In many cases, aggregated datasets are more efficient representations than the underlying record-level dataset.  If the number of unique variable value combinations is small relative to the actual record count, then it makes more sense to store the dataset in aggregated form.
+</p>
+
+<p>
+Table 2 presents the disaggregated form of Table 1.
+</p>
+
+<table>
+<caption>Table 2: Disaggregated Dataset</caption>
+<tr><th>var1</th><th>var2</th></tr>
+<tr><td>1</td><td>1</td></tr>
+<tr><td>1</td><td>1</td></tr>
+<tr><td>1</td><td>2</td></tr>
+<tr><td>2</td><td>1</td></tr>
+<tr><td>2</td><td>1</td></tr>
+<tr><td>2</td><td>1</td></tr>
+<tr><td>2</td><td>2</td></tr>
+<tr><td>2</td><td>2</td></tr>
+<tr><td>2</td><td>2</td></tr>
+<tr><td>2</td><td>2</td></tr>
+</table>
+
+<p>
+Since both forms are common, it would be helpful to have tools that can quickly aggregate and disaggregate these datasets.  Since aggregating a dataset is such a common operation, creating Table 1 from Table 2 is quite easy.  If you are familiar with SQL, you will notice that Table 1 can be generated using the <code>SELECT DISTINCT</code> statement.  From within SAS, the following code will create Table 1 from Table 2:
+</p>
+
+<pre>
+proc sql;
+    create table work.table1 as
+    select distinct var1, var2, count(*) as count
+    from work.table2
+    group by var1, var2;
+quit;
+</pre>
+
+<p>
+SPSS has an equally facile command for creating aggregated datasets using the following code (assume that table2 is the working data file).
+</p>
+
+<pre>
+aggregate
+    /outfile='table1.sav'
+    /break=var1 var2
+    /count=n.
+</pre>
+
+<p>
+The <code>BY</code> statement in a SAS data step initializes the <code>first</code> and <code>last</code> temporary variables which can be used to control data step processing at a fine-grained level.  Although somewhat more complex, this code will do the same as the SQL version above, but with the requirement that Table 2 must be sorted in ascending order on var1 first and var2 second.
+</p>
+
+<pre>
+data trash.table1;
+    retain var1 var2 count;
+    set trash.table2; by var1 var2;
+    count+1;
+    if first.var2 then count=1;
+    if last.var2 then output;
+run;
+</pre>
+
+<p>
+Given the relative complexity of the operations that need to be performed on each row of Table 2, the fact that SAS (with and without SQL) and SPSS both have built in commands to perform aggregation is proof positive that this kind of data transformation is very common.  Consider how many different operations are needed to accomplish aggregation as shown in the following pseudo-code:
+</p>
+
+<pre>
+Initialize Table 1 as (var1, var2, count)
+For each row in Table 2, do:
+    Lookup (var1, var2) in Table 1
+    If found, do:
+        Increment count
+    Else:
+        Insert in Table 1 (var1, var2, 1)
+Next row
+</pre>
+
+<p>
+In addition to basic facilities for row retrieval and insertion, a lookup routine needs to be involved which will likely require a binary search library for optimal performance.  Since SQL engines are well suited to handle all of these operations, it is no surprise that aggregation is one of the central features of a basic <code>SELECT</code> query.
+</p>
+
+<br />
+
+<h2>Disaggregation</h2>
+
+<p>
+The inverse procedure, disaggregation, is much more difficult to accomplish using SQL statements even though the pseudo-code for generating Table 2 from Table 1 can be expressed simply:
+</p>
+
+<pre>
+Initialize Table 2 as (var1, var2)
+For each row in Table 1, do:
+    For i = 1 to (count), do:
+        Insert in Table 2 (var1, var2)
+    Loop
+Next row
+</pre>
+
+<p>
+Basically, for each row, all that needs to happen is to read the value of the count variable, then output the var1 and var2 values that many times.  Both SAS and SPSS can accomplish this very easily.  In SAS:
+</p>
+
+<pre>
+data work.table2;
+    set work.table1;
+    do i=1 to count;
+        output;
+    end;
+    keep var1 var2;
+run;
+</pre>
+
+<p>
+And in SPSS:
+</p>
+
+<pre>
+loop i=1 to count.
+xsave outfile='table2.sav' /keep=var1 var2.
+end loop.
+execute.
+</pre>
+
+<p>
+There is no simple way to do this using SQL statements.  SQL is strictly procedural and there is no internal macro facility that would allow looping for each value of the count variable.  In SAS, you could use the macro facility to store the necessary overhead variables used in processing the loops, but the syntax quickly becomes unsightly, especially in comparison with the simple and easy to read steps shown above.  Although well suited for aggregation, SQL is definitely not the best choice for disaggregation.
+</p>
+
+<br />
+
+<h2>Transposition</h2>
+
+<p>
+Until this point the discussion has focused on ways to transform datasets from a record-level (disaggregated) state into a summary level (aggregated) state.  An interesting situation arises when the record-level dataset itself can be considered an aggregation.  Consider Table 3:
+</p>
+
+<table>
+<caption>Table 3</caption>
+<tr><th>id</th><th>var1_1</th><th>var1_2</th><th>var1_3</th><th>var2_1</th><th>var2_2</th><th>var2_3</th></tr>
+<tr><td>1</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
+<tr><td>2</td><td>2</td><td>2</td><td>2</td><td>6</td><td>5</td><td>4</td></tr>
+</table>
+
+<p>
+Table 3 is clearly a record-level dataset, but assume that "var1" represents the response to some stimuli and the three underscores demarcate three different stimuli:  var1_1 is the response to stimulus 1, var1_2 is the response to stimulus 2, and so on.  Then, let "var2" be the measurement of some other response to the same stimuli.  Now we can think of this record-level dataset as an aggregation of these stimulus-responses for three separate cases.  In this scenario, Table 4 can  be thought of as the disaggregation of Table 3.
+</p>
+
+<table>
+<caption>Table 4</caption>
+<tr><th>id</th><th>var</th><th>data</th></tr>
+<tr><td>1</td><td>var1_1</td><td>1</td></tr>
+<tr><td>1</td><td>var1_2</td><td>2</td></tr>
+<tr><td>1</td><td>var1_3</td><td>3</td></tr>
+<tr><td>1</td><td>var2_1</td><td>4</td></tr>
+<tr><td>1</td><td>var2_2</td><td>5</td></tr>
+<tr><td>1</td><td>var2_3</td><td>6</td></tr>
+<tr><td>2</td><td>var1_1</td><td>2</td></tr>
+<tr><td>2</td><td>var1_2</td><td>2</td></tr>
+<tr><td>2</td><td>var1_3</td><td>2</td></tr>
+<tr><td>2</td><td>var2_1</td><td>6</td></tr>
+<tr><td>2</td><td>var2_2</td><td>5</td></tr>
+<tr><td>2</td><td>var2_3</td><td>4</td></tr>
+</table>
+
+<p>
+Tables 3 and 4 are identical in what they represent, the only difference is their implicit structure.  Both structures are useful in different circumstances.  While Table 3 is the definitive record-level dataset, it is often more natural to collect data as in Table 4.  Table 4 can also be more easily optimized for certain types of queries.
+</p>
+
+<p>
+Close examination will show that Table 4 is a transposition of Table 3.  Strictly speaking, the transpose of a table is one in which the rows and columns have been flipped.  In other words, the first row becomes the first column, the first column becomes the first row, and so on.  Table 4 meets this definition with a twist.  The first six rows (where id=1) store all the same data as the first row of Table 3 where the original variable names themselves are stored in a new column.
+</p>
+
+<p>
+If you are still unconvinced, the following code will make it clear that Tables 3 and 4 are transpositions of one another.  Using the <code>TRANSPOSE</code> procedure in SAS will generate Table 3 from Table 4:
+</p>
+
+<pre>
+proc transpose data=work.table4 out=work.table3;
+    id var;
+    by id;
+run;
+</pre>
+
+<p>
+Using SPSS, this code will do the same thing:
+</p>
+
+<pre>
+casestovars
+    /id = id
+    /index = var
+    /groupby = variable .
+</pre>
+
+<p>
+To transpose in the other direction, creating Table 4 from Table 3, is just as easy.  In SAS:
+</p>
+
+<pre>
+proc transpose data=work.table3 out=work.table4;
+    by id;
+run;
+</pre>
+
+<p>
+And in SPSS:
+</p>
+
+<pre>
+varstocases  /make data from var1_1 var1_2 var1_3
+  var2_1 var2_2 var2_3
+ /index = index1(data)
+ /keep =  id
+ /null = keep.
+</pre>
+
+<p>
+Table 5 is another way of representing the disaggregation of Table 3.  Here, a variable called "loop" is introduced to identify the index of the stimulus being tested.  Table 5 can be thought of as a "stacked" version of Table 3, where each individual record-level row is repeated for each of the three stimuli.  Tables in this format are often used instead of Table 3 as they may be more appropriate for storing, presenting, or filtering the data for certain types of analysis.
+</p>
+
+<table>
+<caption>Table 5</caption>
+<tr><th>loop</th><th>id</th><th>var1</th><th>var2</th>
+<tr><td>1</td><td>1</td><td>1</td><td>4</td></tr>
+<tr><td>1</td><td>2</td><td>2</td><td>6</td></tr>
+<tr><td>2</td><td>1</td><td>2</td><td>5</td></tr>
+<tr><td>2</td><td>2</td><td>2</td><td>5</td></tr>
+<tr><td>3</td><td>1</td><td>3</td><td>6</td></tr>
+<tr><td>3</td><td>2</td><td>2</td><td>4</td></tr>
+</table>
+
+<p>
+This is a slightly different situation than seen in Table 4.  Table 5 is still a transpose of Table 3, but it involves a transpose in two parts - once to transpose var1 and once again for var2.  The SAS code to convert Table 3 into Table 5 beginning with <code>PROC TRANSPOSE</code> is definitely becoming more cumbersome:
+</p>
+
+<pre>
+proc transpose data=work.table3 out=work.tmp1;
+    by id;
+run;
+data work.tmp2;
+    set work.tmp1;
+    if index(_name_, "var1") ^= 0;
+    loop = substr(_name_, 6);
+    rename col1=var1;
+    drop _name_ _label_;
+run;
+data work.tmp3;
+    set work.tmp1;
+    if index(_name_, "var2") ^= 0;
+    loop = substr(_name_, 6);
+    rename col1=var2;
+    drop _name_ _label_;
+run;
+data work.table5;
+    merge work.tmp2 work.tmp3;
+    by id loop;
+run;
+proc sort data=work.table5;
+    by loop id;
+run;
+</pre>
+
+<p>
+An alternative way to transform Table 3 into Table 5 is to use macro programming.  There are really two different loops going on here, one for the three stimuli and one for the two variables of interest.  SAS macros are very adept at solving this type of problem, where looping is required.  In the program below, the <code>LOOP</code> macro contains a loop that runs three times, once for each of the three stimuli.  In each iteration of the loop, a copy of Table 3 is created and the appropriate values for var1 and var2 are determined based on their position in the loop.  After running the macro, a data step combines the three temporary datasets into Table 5.
+</p>
+
+<pre>
+%macro LOOP;
+    %let nloops = 3;
+    %do i = 1 %to &nloops;
+        data work.t5_&i;
+            set work.table3;
+            loop = &i;
+            var1 = var1_&i;
+            var2 = var2_&i;
+        run;
+    %end;
+%mend;
+%LOOP;
+data work.table5;
+    set work.t5_1 work.t5_2 work.t5_3;
+    keep loop id var1 var2;
+run;
+</pre>
+
+<p>
+I will leave the tasks of transforming Table 5 back into Table 3 as well as SPSS solutions to these problems as exercises to the reader (what a lovely excuse).
+</p>
+
+<p>
+Transposition is very difficult to accomplish in a purely SQL based environment.  Without recourse to some kind of macro facility, all the SQL statements would need to be individually hard-coded to perform the transformations in this section.  That said, if you are working from within a scripting language, or in a SAS macro environment, it is not difficult to recode Table 5 from Table 3.  Here is one way this could be done using SAS that is even more compact than the data step code:
+</p>
+
+<pre>
+%macro LOOPSQL;
+  proc sql;
+    create table work.table5
+      (loop num, id num, var1 num, var2 num);
+    %let nloops = 3;
+    %do i = 1 %to &nloops;
+      insert into work.table5
+        select &i, id, var1_&i, var2_&i from work.table3;
+    %end;
+  quit;
+%mend;
+%LOOPSQL;
+</pre>
+
+<p>
+Any scripting language will have similar facilities for program logic which will allow you to adapt this code to work in your own SQL environment.
+</p>
+
+<p>
+Again, although these are simple examples, and a lot more work could be done on this code to generalize it for any number of variables and any number of stimuli, these types of transformations among different datasets are very common.  It is helpful to identify the generalities in your specific problem at hand, as that will assist in solving similar problems in the future.
+</p>
+
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+</div><!-- two -->
+</div><!-- one -->
+</body>
+</html>

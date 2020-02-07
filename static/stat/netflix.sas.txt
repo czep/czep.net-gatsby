@@ -1,0 +1,114 @@
+/********************************************************************/
+/* SAS code to import data files for Netflix Prize                  */
+/*    by czep on 07 oct 2006 from <http://czep.net/>                */
+/* This file is public domain. Tested on athlon64-xppro             */
+/********************************************************************/
+
+/* set data directory for raw data and sas data */
+%let rdd = C:\Data\Netflix\download;
+libname dd "C:\Data\Netflix\sasdata";
+
+
+/* movie_titles, n=17770, size~4.6MB */
+data dd.movie_titles;
+    infile "&rdd.\movie_titles.txt" dlm=','
+        truncover length=linelen col=colptr;
+    input movid t_year $5. @;
+    if t_year = 'NULL,' then year = .; else year = input(t_year,4.);
+    varlen = linelen - colptr + 1;
+    input @colptr title $varying256. varlen;
+    keep movid year title;
+run;
+
+
+/* probe, n=1408395, size~16.4MB */
+data dd.probe;
+    infile "&rdd.\probe.txt" truncover;
+    length movid 4 custid 5;
+    retain movid;
+    input rec $256.;
+    pos = indexc(rec, ':');
+    if pos > 0 then do;
+        movid = input(substr(rec, 1, pos-1), 5.);
+        delete;
+    end;
+    custid = input(rec, 7.);
+    keep movid custid;
+run;
+
+
+/* qualify, n=2817131, size~43.7MB */
+data dd.qualify;
+    infile "&rdd.\qualifying.txt" truncover;
+    length movid 4 custid 5 ratedate 4;
+    format ratedate yymmddd10.;
+    retain movid;
+    input rec $256.;
+    pos = indexc(rec, ':');
+    if pos > 0 then do;
+        movid = input(substr(rec, 1, pos-1), 5.);
+        delete;
+    end;
+    else do;
+        pos = indexc(rec, ',');
+        custid = input(substr(rec, 1, pos-1), 7.);
+        ratedate = input(substr(rec, pos+1), yymmdd10.);
+    end;
+    keep movid custid ratedate;
+run;
+
+
+/* train, n=100480507, size~1.5GB */
+
+%macro import_training_dataset(fname=);
+    data dd.t1;
+        infile "&rdd.\training_set\&fname." truncover;
+        length movid 4 custid 5 rate 3 ratedate 4;
+        format ratedate yymmddd10.;
+        retain movid;
+        input rec $256.;
+        pos = indexc(rec, ':');
+        if pos > 0 then do;
+            movid = input(substr(rec, 1, pos-1), 5.);
+            delete;
+        end;
+        else do;
+            pos = indexc(rec, ',');
+            custid = input(substr(rec, 1, pos-1), 7.);
+            rate = input(substr(rec, pos+1, 1), 1.);
+            ratedate = input(substr(rec, pos+3), yymmdd10.);
+        end;
+        keep movid custid rate ratedate;
+    run;
+%mend;
+
+
+%macro get_all_training_data(test=Y);
+    filename dirref "&rdd.\training_set";
+    %let dirid = %sysfunc(dopen(dirref));
+    %let fcount = %sysfunc(dnum(&dirid));
+    %if %eval(&test=Y) %then %do;
+        %let fcount = 3;
+        %put >>> This is a test, only 3 datasets will be imported <<<;
+    %end;
+    %else %put >>> Importing &fcount. training datasets now... ;
+    %do i=1 %to &fcount.;
+        %let fname = %sysfunc(dread(&dirid, &i));
+        %import_training_dataset(fname=&fname);
+        %if %eval(&i=1) %then %do;
+            data dd.train; set dd.t1; run;
+        %end;
+        %else %do;
+            proc datasets dd=dd nolist;
+                append base=dd.train data=dd.t1;
+            run;
+        %end;
+        %put Done with &fname.;
+    %end;
+    %let rc = %sysfunc(dclose(&dirid));
+    proc datasets dd=dd nolist; delete t1; run;
+    quit;
+%mend;
+
+options nonotes;
+%get_all_training_data(test=Y); /* set to "N" when you want to do this for all 17770 files */

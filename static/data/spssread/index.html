@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css" media="all">@import url("../../main.css");</style>
+<style type="text/css" media="all">
+    table {
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid black;
+    }
+    caption {
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: bold;
+        margin-top: 1em;
+    }
+    tr, th, td {
+        margin: 10px;
+        border: 1px solid black;
+    }
+    th, td {
+        text-align: center;
+    }
+    .cbox2 .e .content {
+        padding: 0 46px 0 30px;
+    }
+    pre {
+        margin: 1em 0 1em 0;
+        padding: 1em;
+        border: 1px solid #555;
+    }
+    a:hover {
+        background: #99f;
+    }
+</style>
+<title>spssread.pl</title>
+</head>
+
+<body>
+<div id="one">
+<div id="two">
+
+
+<h1>spssread.pl</h1>
+
+<!-- begin cbox -->
+<div class="cbox2">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>A Perl script to extract metadata from SPSS data files</h2>
+<p>
+On this page, I describe and make available for download a perl script, <a href="spssread.txt">spssread</a>, which can be used to extract metadata from SPSS data files.
+</p>
+
+<br />
+<h2>Background</h2>
+<p>
+The native file format for SPSS data files is the SAV file.  This is a binary file format containing both data and "dictionary" information pertaining to the dataset, including variable labels and value labels.  Many statistical packages and other commercial third-party tools offer methods of converting SPSS data files into different formats.  However, in addition to being costly, these tools may not always be as flexible as a given situation requires.  Since source code is not available, it is not often possible to extract the required information in the most easily accessible format.
+</p>
+<p>
+In the SPSS Developer's Guide (available on the product CD-ROM or via download from the support section of their website), SPSS provides details on how to use a royalty-free Windows DLL to programatically access the contents of a SAV file.  In addition to requiring significant programming effort, this is limited to being of use solely within the win32 environment.  Still, this is the only SPSS-approved way of accessing SAV files, with the exception, naturally, of the SPSS program itself.  It is likely that the third-party conversion tools were developed using this DLL.
+</p>
+<p>
+The only official documentation of the SAV file format specification that is publicly-available is an eight-page chapter from a very old manual (the latest version of SPSS referenced in the document is version 4.0).  This document is available on <a href="http://www.wotsit.org/">Wotsit's format</a> (search for "SAV").
+</p>
+<p>
+Additional useful information can be found at the website of the ambitious <a href="http://www.gnu.org/software/pspp/pspp.html">PSPP project</a>, an open source clone of SPSS.
+</p>
+<p>
+Using these sources, I wrote a program to parse and print the metadata stored in SAV files.  A first pass was made several years ago in C, but this release has been re-written in perl for beauty and simplicity.
+</p>
+
+<br />
+<h2>Download</h2>
+<p>
+<ul>
+<li><a href="spssread.txt">spssread</a></li>
+</ul>
+</p>
+
+<br />
+<h2>Instructions for use</h2>
+<p>
+You must have a perl interpreter installed.  On unix-ish systems, check for /usr/bin/perl.  On Windows, try <a href="http://www.activestate.com/">ActiveState Perl</a>.
+</p>
+<p>
+At present, three reporting options are available:
+</p>
+<pre>
+Usage: ./spssread.pl [OPTION] [spss-filename.sav]
+Choose one of the following single-character options:
+  -h  Print File Header information
+  -r  Print tab-delimited info about Variables
+  -l  Print tab-delimited info about Value Labels
+</pre>
+
+<p>
+The 'h' option prints a list of the fields stored in the SPSS File Header.  These are not entirely valuable in themselves but may provide insight if you run into errors using the other options.  The following listing shows the results of running the 'h' option on the file "voter.sav" provided on the SPSS product CD-ROM.
+</p>
+<pre>
+$ ./spssread.pl -h voter.sav
+
+Record type      $FL2
+Product name     @(#) SPSS DATA FILE MS WINDOWS Release 8.0
+Layout code      2
+Case Size        6
+Compression      1
+Weight index     0
+Number of cases  1847
+Bias             100.000000
+Creation date    22 Nov 98
+Creation time    22:03:11
+File label
+
+</pre>
+
+<p>
+The 'r' option prints a tab-delimited listing of the variable names, their type (whether numeric or string), and their label if any.  Here, I have added a new variable to the "voter.sav" file to show how string variables are listed.
+</p>
+<pre>
+$ ./spssread.pl -r voter.sav
+Name      Type          Label
+PRES92    Numeric       VOTE FOR CLINTON, BUSH, PEROT
+AGE       Numeric       AGE OF RESPONDENT
+AGECAT    Numeric       age categories
+EDUC      Numeric       HIGHEST YEAR OF SCHOOL COMPLETED
+DEGREE    Numeric       RS HIGHEST DEGREE
+SEX       Numeric       RESPONDENTS SEX
+TEXTVAR   String (23)   New string variable of length 23.
+</pre>
+
+<p>
+The 'l' (that's a lower case version of 'L') option prints a tab-delimited listing of value labels associated with each variable.  There are many conceivable ways of organizing this information, and I have chosen the one that best suits my needs.  For each variable for which value labels are present, there is one row for each value/label pair associated with the variable.  If you'd prefer to present the value label metadata differently, this can be done in the "print_value_labels" subroutine.
+</p>
+<pre>
+$ ./spssread.pl -l voter.sav
+Varname   Value   Label
+PRES92    1       Bush
+PRES92    2       Perot
+PRES92    3       Clinton
+AGECAT    1        lt 35
+AGECAT    2       35 - 44
+AGECAT    3       45 - 64
+AGECAT    4       65 +
+DEGREE    0       lt high school
+DEGREE    1       high school
+DEGREE    2       junior college
+DEGREE    3       bachelor
+DEGREE    4       graduate degree
+SEX       1       male
+SEX       2       female
+</pre>
+
+<p>
+The script prints to standard output, making it easy to redirect to a file
+</p>
+<pre>
+$ ./spssread.pl -l voter.sav > labels.txt
+</pre>
+
+<p>
+Note that on Windows, you may have to start the script from a command prompt like this:
+</p>
+<pre>
+C:\> c:\perl\bin\perl.exe spssread.pl
+</pre>
+
+<br />
+<h2>Legal</h2>
+<p>
+SPSS is a registered trademark of <a href="http://www.spss.com/">SPSS Inc.</a>  Neither this website nor its author are affiliated with SPSS.  This program is not endorsed or supported by SPSS.
+</p>
+<p>
+<a href="spssread.txt">spssread</a> is licensed under the <a href="http://www.gnu.org/licenses/gpl.html">GNU General Public License</a>.
+</p>
+<p>
+Feel free to <a href="/contact/">contact me at this link</a>.
+</p>
+
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+</div><!-- two -->
+</div><!-- one -->
+</body>
+</html>

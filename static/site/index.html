@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css" media="all">@import url("../main.css");</style>
+<title>Site Notes at czep.net</title>
+</head>
+
+<body>
+<div id="one">
+<div id="two">
+
+<h1 style="padding-top: 1em;">Site Notes and Credits</h1>
+
+<!-- begin cbox -->
+<div class="cbox">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Site Notes</h2>
+<p>
+<a href="http://czep.net">czep.net</a> has been designed in a loose attempt to adhere to basic web standards and to follow the guidelines of modern markup based on the <a href="http://www.w3.org/TR/xhtml1/">XHTML 1.0 Transitional</a> and the <a href="http://www.w3.org/TR/REC-CSS2/">CSS2 style sheet</a> specifications.  Not being a standards evangelist, my motivation is more driven by my own sense that this is simply the correct way to do things.  I am not a professional web developer and this site was most decidedly not created with profit in mind nor do I feel it necessary to cater to anyone's peculiar tastes but my own.  This is why I say I am making merely a loose attempt to adhere to the standards.
+</p>
+<p>
+One year after I originally set out to redesign this site, I am happy to report not only that I have more or less satisfactorily achieved the design goals I had in mind, but also that the main index page is now <a href="http://validator.w3.org/">officially valid</a>.  You will no doubt have already recognized my obsession with the rounded-corners motif and this was indeed the primary feature of my new design.  It wasn't until last weekend, however, that the complete "trifecta" became real.  The original idea for dressing up the site's navigational links involved three key features:
+</p>
+<ol>
+<li>Boxes with rounded corners encompassing the links</li>
+<li>A drop shadow effect on the boxes</li>
+<li>A "button-like" look and feel to the boxes</li>
+</ol>
+<p>
+At first, I settled for flat boxes and had to use non-standard markup to simulate the button-like rollover effect.  It took a few rounds with the image software (and plenty of google searches) before I got the drop shadow working.  Finally, some javascript to implement style switching made the button effect more realistic.
+</p>
+<p>
+A series of nested <code>&lt;div&gt;</code> elements, each with a different background url pointing to a small image file, is used to setup the structural layout of the boxes.  There are three different versions:  one for the initial state of the box, one for its hover state, and one that is shown when the box is clicked.  The complete effect only works in javascript-enabled browsers, since scripting is used to dynamically change the class of the <code>&lt;div&gt;</code> in response to <code>onmouseover</code> and <code>onmousedown</code> events.
+</p>
+<p>
+All links remain functional even in browsers without javascript or CSS support.  Without javascript, users will not see the rollover or click effects, but they will still see the text of the link change background color on hover and, more importantly, they will still be able to navigate to the page of their choice because the descriptive text inside each box is wrapped inside an anchor tag.  For javascript users, the anchor tags are removed in the <code>init</code> function; otherwise, the browser might attempt to follow the link twice.
+</p>
+<p>
+Finally, to enable fast switching of the background images, all of the initially unused images must be preloaded.  This could be accomplished using javascript, but I have chosen to simply include <code>&lt;img&gt;</code> tags for additional background images at the bottom of the page, along with the <code>style="display: none;"</code> directive.
+</p>
+<p>
+You will not find any egregious faults like font face tags or table tags used for structural layout (except perhaps in some of the old pages I couldn't bring myself to rewrite for sentimental reasons).  This site has been tested to work and look good in Firefox v1 and IE6 on Windows.  I don't have a Mac and my linux boxes are tuned for serving pages rather than browsing them.  The site should "degrade gracefully" in browsers that do not support CSS or javascript, and it should also work in text-only browsing environments such as lynx.  However, some older browsers that think they support CSS end up choking painfully and I will simply not apologize for that.  I also can't be bothered with other browsers, so if you are using something other than those listed above, please check that they are standards compliant before kvetching about my site.
+</p>
+<p>
+So now that I finally have the look I was searching for, I can spend some time working on the site's content.  Hopefully this will happen before another year goes by!
+</p>
+<p>
+For reference, the main style sheet used throughout this site can be accessed here: <a href="http://czep.net/main.css">main.css</a>.
+</p>
+
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+
+<!-- begin cbox -->
+<div class="cbox">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Credits</h2>
+
+<p>
+The most excellent work of <a href="http://www.zeldman.com">Jeffrey Zeldman</a> has been an invaluable source in my (re)learning of modern web design.  Zeldman's <a href="http://www.alistapart.com/">A List Apart</a> is full of innovative and insightful articles that present practical tips for web developers concerned about standards, quality, and professional results.  I also highly recommend his book, <a href="http://www.zeldman.com/dwws/">Designing With Web Standards</a>.
+</p>
+<p>
+<a href="http://www.meyerweb.com/">Eric Meyer</a> is the foremost expert on Cascading Style Sheets.  His <a href="http://www.meyerweb.com/eric/books/css-tdg/">Cascading Style Sheets: The Definitive Guide, Second Edition</a> is an excellent reference.
+</p>
+<p>
+There are many examples of rounded corners available on the web, but I found <a href="http://www.redmelon.net/tstme/4corners/">this one at redmelon.net</a> to be the best starting point for my design.
+</p>
+<p>
+This website is hosted by <a href="http://pair.com">Pair Networks</a>.
+</p>
+
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+
+</div><!-- two -->
+</div><!-- one -->
+</body>
+</html>

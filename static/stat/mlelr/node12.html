@@ -1,0 +1,551 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Implementation</TITLE>
+<META NAME="description" CONTENT="Implementation">
+<META NAME="keywords" CONTENT="mlelr_www">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="mlelr_www.css">
+
+<LINK REL="next" HREF="node13.html">
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="up" HREF="mlelr_www.html">
+<LINK REL="next" HREF="node13.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html146"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html144"
+  HREF="mlelr_www.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html138"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html147"
+  HREF="node13.html">Bibliography</A>
+<B> Up:</B> <A NAME="tex2html145"
+  HREF="mlelr_www.html">Maximum Likelihood Estimation of</A>
+<B> Previous:</B> <A NAME="tex2html139"
+  HREF="node11.html">Newton-Raphson</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00030000000000000000">
+Implementation</A>
+</H1>
+The following is an outline of a skeletal implementation for logistic regression using the C programming language.  The routines presented here focus on a practical application of the mathematical theory outlined in the section above.  To be useful in a real program, they would need to incorporate user and data interface methods, including a means of selecting variables and constructing an appropriate design matrix.  Different methods of parameterization--dummy coding, full-rank center-point, direct specification, and interaction effects--are not discussed here.  We will also not take into accout imputation strategies for dealing with missing values or any other subtleties for pre-processing the data or optimizing the modeling process.  Also omitted are the calculation of goodness-of-fit tests and significance tests of the parameter estimates.  There are also a number of auxilliary functions which are beyond the scope of this document and will not be covered here.  For further details in any of these areas, the reader is strongly encouraged to investigate the texts included in the References section.  Furthermore, we will not deal with error handling, memory allocation, or compiler optimization techniques.
+
+<P>
+The function <code>mlelr</code> is used as the entry point to set up the iterations that will take place in the <code>newton_raphson</code> function.  At minimum, this function will require the following arguments:
+
+<P>
+<PRE>
+int mlelr (
+    int      J,     /* number of discrete values of y */
+    int      N,     /* number of populations */
+    int      K,     /* number of columns in x */
+    double  *n,     /* population counts - length N */
+    double **y,     /* dv counts - N rows and J-1 columns */
+    double **pi,    /* probabilities - N rows and J-1 columns */
+    double **x,     /* design matrix - N rows and K+1 columns */
+    double  *beta   /* parameters - K+1 * J-1 rows */
+    double  *xrange /* range of x - length K+1 */
+    ) {
+</PRE>
+We will try to abide by the naming convention established earlier, so far as it remains convenient.  Note that <code>n</code>, <code>beta</code>, and <code>xrange</code> are declared as pointers to double.  In C, we can access these using array subscripts, such as <code>n[i]</code>.  The variables <code>y</code>, <code>pi</code>, and <code>x</code> are each declared as pointer to pointer to double, thus creating the effect of a matrix which can be accessed using syntax like <code>pi[i][j]</code>.  The array <code>xrange</code> is needed in the test for parameter estimates tending toward infinity.  It should contain as many elements as there are columns in the design matrix, with each element specifying the range from lowest to highest value for the corresponding independent variable.  In this routine, we will treat our parameter matrix <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$"> as a vector, where each column is appended below the first.  This makes it easier to construct the matrix involving second derivatives, which we will introduce below:
+
+<P>
+<PRE>
+    /* local variables */
+    int      i,j,k;    
+    const int max_iter = 30;
+    const double eps = 1e-8;
+    int      iter = 0;
+    int      converged = 0;    
+    double  *beta_old;
+    double  *beta_inf;
+    double **xtwx;
+    double   loglike = 0;
+    double   loglike_old = 0;
+</PRE>
+<code>max_iter</code> is the maximum number of Newton-Raphson iterations to try before assuming that the model does not converge.  <code>eps</code>, short for <I>epsilon</I>, is the threshold below which parameter estimates from subsequent iterations are assumed to be equal.  When all the differences from the current to the prior iteration are less than <code>eps</code>, we assume the model has converged.  The two arrays <code>beta_old</code> and <code>beta_inf</code> need to have space allocated to match the dimensions of <code>beta</code>.  <code>beta_old</code> is used to store the parameter estimates from a prior iteration before starting a new one, and <code>beta_inf</code> is used in the test for infinite parameters.  The matrix <code>xtwx</code>, read <!-- MATH
+ $\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$
+ -->
+<IMG
+ WIDTH="72" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img150.png"
+ ALT="$ \boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$">, needs to be set up with <code>(K+1)*(J-1)</code> rows and columns.
+
+<P>
+<PRE>
+    /* allocate space for local arrays */
+    .
+    .   /* malloc code here */
+    .
+    /* initialize parameters to zero */
+    for (k = 0; k &lt; (K + 1) * (J - 1); k++) {
+        beta[k] = 0;
+        beta_inf[k] = 0;
+        for (j = 0; j &lt; (K + 1) * (J - 1); j++) {
+            xtwx[k][j] = 0;
+        }
+    }
+</PRE>
+An alternative approach would be to run a linear regression of <!-- MATH
+ $\log(\pi_{ij}/\pi_{iJ})$
+ -->
+<IMG
+ WIDTH="95" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img151.png"
+ ALT="$ \log(\pi_{ij}/\pi_{iJ})$"> with the design matrix to obtain starting values for each <code>beta[k]</code>.  This initially adds more computational cycles, but will usually reduce the number of Newton-Raphson iterations needed to bring the model to convergence.  Now we can set up the main loop as follows:
+
+<P>
+<PRE>
+    /* main loop */
+    while (iter &lt; max_iter &amp;&amp; !converged) {
+    
+        /* copy beta to beta_old */
+        for (k = 0; k &lt; (K + 1) * (J - 1); k++) {
+            beta_old[k] = beta[k];
+        }
+</PRE>
+The main loop will run until the parameter estimates converge, or the number of iterations reaches the maximum allowed.  The first step in the loop is to store the current values of <code>beta</code> in <code>beta_old</code>.  The next step is to perform one iteration:
+
+<P>
+<PRE>
+        /* run one iteration of newton_raphson */
+        loglike_old = loglike;
+        loglike = newton_raphson(J,N,K,n,y,pi,x,beta,xtwx);
+</PRE>
+Our <code>newton_raphson</code> function returns the value for the log likelihood function evaluated at the current iteration.  In a production system, it would be much safer to let this function return an error status code, since a number of problems can arise within that routine that would then need to be handled here.
+
+<P>
+<PRE>
+        /* test for decreasing likelihood */
+        if (loglike &lt; loglike_old &amp;&amp; iter &gt; 0) {
+            .
+            .  /* code to backtrack here */
+            .
+        }
+</PRE>
+After returning from an iteration, and verifying that the iteration completed successfully, the next step is to check whether the value of the log likelihood function has decreased since the previous iteration.  If so, we can include code to backtrack in a series of sub-iterations which successively halve the distance between the current and prior iteration until a point is reached where the likelihood does increase.  If such a point is not found after some number of sub-iterations, we conclude that the model had converged at the prior iteration, although it may be the case that the iterative procedure has degenerated and strayed too far from the true root.  It would definitely be necessary to inform the user that this occurred.
+
+<P>
+<PRE>
+        /* test for infinite parameters */
+        for (k = 0; k &lt; (K + 1) * (J - 1); k++) {            
+            if (beta_inf[k] != 0) {                                                         
+                beta[k] = beta_inf[k];                       
+            }                          
+            else {                                                   
+                if ((fabs(beta[k]) &gt; (5 / xrange[k])) &amp;&amp; 
+                    (sqrt(xtwx[k][k]) &gt;= (3 * fabs(beta[k])))) {
+                        beta_inf[k] = beta[k];                                                  
+                }
+            }                                                                 
+        }
+</PRE>
+The above code handles a test for parameter estimates tending to infinity as outlined in the section on caveats.  If an element of the array <code>betainf</code> is not zero, then the value stored there is the last known value for <code>beta[k]</code> before it was assumed to be infinity.  We hold it constant in all subsequent iterations so that it no longer interferes with the test for convergence.  Note that the standard error of each <code>beta[k]</code> is the square root of the corresponding diagonal element of <code>xtwx</code>.
+
+<P>
+<PRE>
+        /* test for convergence */
+        converged = 1;
+        for (k = 0; k &lt; (K + 1) * (J - 1); k++) {
+            if (fabs(beta[k] - beta_old[k]) &gt; 
+                eps * fabs(beta_old[k])) {
+                    converged = 0;                                               
+                    break;                                                       
+            }                                                                
+        }   
+        iter++;
+    }  /* end of main loop */
+</PRE>
+The test for convergence requires every new parameter estimate to differ by the prior estimate by less than the value for <code>eps</code>.  If this condition is not satisfied, the main loop will execute again.
+
+<P>
+The function that handles the Newton-Raphson iterations begins:
+
+<P>
+<PRE>
+double newton_raphson(int J, int N, int K, 
+    double *n, double **y, double **pi, double **x,
+    double *beta, double **xtwx) {
+    
+    /* local variables */
+    int i, j, jj, jprime, k, kk, kprime;
+    double *beta_tmp;
+    double **xtwx_tmp;
+    double loglike;
+    double denom;
+    double *numer;  /* length J-1 */
+    double tmp1, tmp2, w1, w2;
+</PRE>
+The variables <code>beta_tmp</code> and <code>xtwx_tmp</code> are temporary versions of the variables they resemble that will be used to build the new values for the current iteration.  Before continuing, these would need to have space allocated for them with <code>malloc</code>, and each element should be initialized to zero.  The variable <code>loglike</code> will be used to store the return value for this function.
+
+<P>
+In the next step, we establish a loop for each row in the design matrix.  This is a very busy loop where most of the work of Newton-Raphson will be accomplished.  Refer to Eq.&nbsp;<A HREF="node6.html#eq:NR-2">23</A> as a reminder of the calculations that need to be made. Upon first entering the loop, we calculate the values for <IMG
+ WIDTH="29" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img152.png"
+ ALT="$ \pi{ij}$"> for the given row, <IMG
+ WIDTH="10" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img8.png"
+ ALT="$ i$">.  This is done using Eq.&nbsp;<A HREF="node9.html#eq:multinomial-logit-model-simpl-1">25</A>.
+
+<P>
+<PRE>
+    /* main loop for each row in the design matrix */
+    for (i = 0; i &lt; n; i++) {
+        
+        /* matrix multiply one row of x * beta */
+        denom = 1;
+        for (j = 0; j &lt; J - 1; j++) {
+            tmp1 = 0;
+            for (k = 0; k &lt; K + 1; k++) {
+                tmp1 += x[i][k] * beta[j*(K+1)+k];
+            }
+            numer[j] = exp(tmp1);
+            denom += numer[j];
+        }
+        
+        /* calculate predicted probabilities */
+        for (j = 0; j &lt; J - 1; j++) {
+            pi[i][j] = numer[j] / denom;
+        }
+</PRE>
+Note that since we are treating <code>beta</code> as a vector, we need to offset its index by the <IMG
+ WIDTH="26" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.png"
+ ALT="$ j^{th}$"> multiple of <IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img19.png"
+ ALT="$ K+1$"> before adding <code>k</code> to its index in the matrix multiplication.
+
+<P>
+Next, we can calculate the <IMG
+ WIDTH="24" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img17.png"
+ ALT="$ i^{th}$"> row's contribution to the value of the log likelihood function.  To do this, we need to consider all the terms in Eq.&nbsp;<A HREF="node10.html#eq:multinomial-pdf">26</A>, including the factorial terms that were omitted in the derivation of the kernel of the log likelihood.  Taking the log of Eq.&nbsp;<A HREF="node10.html#eq:multinomial-pdf">26</A> yields:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:log-likelihood-complete"></A><!-- MATH
+ \begin{equation}
+\sum_{i=1}^N \biggl[ \log(n_i!) + \sum_{j=1}^J y_{ij} \log(\pi_{ij}) - \log(y_{ij}!) \biggr]
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="317" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img153.png"
+ ALT="$\displaystyle \sum_{i=1}^N \biggl[ \log(n_i!) + \sum_{j=1}^J y_{ij} \log(\pi_{ij}) - \log(y_{ij}!) \biggr]$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(38)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Since it is highly dangerous to evaluate factorials directly, we can use the gamma approximation, where <!-- MATH
+ $\Gamma(x+1) \approx x!$
+ -->
+<IMG
+ WIDTH="107" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img154.png"
+ ALT="$ \Gamma(x+1) \approx x!$">.  Thus, Eq.&nbsp;<A HREF="#eq:log-likelihood-complete">38</A> becomes:
+
+<P>
+<P></P>
+<DIV ALIGN="CENTER"><A NAME="eq:log-likelihood-complete-2"></A><!-- MATH
+ \begin{equation}
+\sum_{i=1}^N \biggl[ \log(\Gamma(n_i+1)) + \sum_{j=1}^J y_{ij} \log(\pi_{ij}) - \log(\Gamma(y_{ij}+1)) \biggr]
+\end{equation}
+ -->
+<TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="416" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"
+ SRC="img155.png"
+ ALT="$\displaystyle \sum_{i=1}^N \biggl[ \log(\Gamma(n_i+1)) + \sum_{j=1}^J y_{ij} \log(\pi_{ij}) - \log(\Gamma(y_{ij}+1)) \biggr]$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(39)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+We implement this in the following code:
+
+<P>
+<PRE>
+        /* add log likelihood for current row */
+        loglike += log_gamma(n[i] + 1);
+        for (j = 0, tmp1 = 0, tmp2 = 0; j &lt; J - 1; j++) {
+            tmp1 += y[i][j];
+            tmp2 += pi[i][j];
+            loglike = loglike - log_gamma(y[i][j]+1) + 
+                y[i][j] * log(pi[i][j]);
+        }
+        
+        /* Jth category */
+        loglike = loglike - log_gamma(n[i]-tmp1+1) + 
+            (n[i]-tmp1) * log(1-tmp2);
+</PRE>
+The details of the <code>log_gamma</code> function are beyond the scope of this article.  For more information, see [<A
+ HREF="node13.html#press">11</A>] and [<A
+ HREF="node13.html#cody">2</A>].  Since we never explicitly store either <IMG
+ WIDTH="27" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img156.png"
+ ALT="$ y_{iJ}$"> or <IMG
+ WIDTH="28" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img119.png"
+ ALT="$ \pi_{iJ}$">, we use <code>tmp1</code> to add the first <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$"> values of <IMG
+ WIDTH="25" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img100.png"
+ ALT="$ y_{ij}$"> and <code>tmp2</code> to add the first <IMG
+ WIDTH="46" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.png"
+ ALT="$ J-1$"> values of <IMG
+ WIDTH="26" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img102.png"
+ ALT="$ \pi_{ij}$">.
+
+<P>
+The following code builds the matrices in the last two terms of Eq.&nbsp;<A HREF="node6.html#eq:NR-2">23</A> by adding the contribution of the <IMG
+ WIDTH="24" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img17.png"
+ ALT="$ i^{th}$"> row to the first and second derivatives of the log likelihood equations.
+
+<P>
+<PRE>
+        /* add first and second derivatives */        
+        for (j = 0, jj = 0; j &lt; J - 1; j++) {
+            tmp1 = y[i][j] - n[i] * pi[i][j];
+            w1 = n[i] * pi[i][j] * (1 - pi[i][j]);
+            for (k = 0; k &lt; K + 1; k++) {
+                beta_tmp[jj] += tmp1 * x[i][k];
+                kk = jj - 1;
+                for (kprime = k; kprime &lt; K + 1; kprime++) {
+                    kk++;
+                    xtwx_tmp[jj][kk] += 
+                        w1 * x[i][k] * x[i][kprime];
+                    xtwx_tmp[kk][jj] = xtwx_tmp[jj][kk];
+                }
+                for (jprime = j + 1; jprime &lt; J - 1; jprime++) {
+                    w2 = -n[i] * pi[i][j] * pi[i][jprime];
+                    for (kprime = 0; kprime &lt; K + 1; kprime++) {
+                        kk++;
+                        xtwx_tmp[jj][kk] += 
+                            w2 * x[i][k] * x[i][kprime];
+                        xtwx_tmp[kk][jj] = xtwx_tmp[jj][kk];
+                    }
+                }
+                jj++;
+            }
+        }
+    } /* end loop for each row in design matrix */
+</PRE>
+In the code above, <code>jj</code> maintains a running counter of the current row of <code>beta_tmp</code> and <code>xtwx_tmp</code>.  The variable <code>kk</code> is used to maintain the current column index of <code>xtwx_tmp</code>.  The outer loop is executed for each value of <code>j</code>.  First, <!-- MATH
+ $y_{ij} - n_i\pi_{ij}$
+ -->
+<IMG
+ WIDTH="83" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img157.png"
+ ALT="$ y_{ij} - n_i\pi_{ij}$"> is calculated and stored in <code>tmp1</code>.  Then, <code>w1</code> is calculated as <!-- MATH
+ $n_i\pi_{ij}(1-\pi_{ij})$
+ -->
+<IMG
+ WIDTH="107" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img148.png"
+ ALT="$ n_i\pi_{ij}(1-\pi_{ij})$">, which is the <IMG
+ WIDTH="24" HEIGHT="18" ALIGN="BOTTOM" BORDER="0"
+ SRC="img17.png"
+ ALT="$ i^{th}$"> diagonal element in the matrix <!-- MATH
+ $\boldsymbol{W}$
+ -->
+<IMG
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img88.png"
+ ALT="$ \boldsymbol{W}$"> when <!-- MATH
+ $j^\prime=j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img133.png"
+ ALT="$ j^\prime = j$">.  The inner loop is executed for each <code>k</code>.  <code>beta_tmp[jj]</code> is incremented by <code>tmp1 * x[i][k]</code>, which, after all rows are taken into account, will result in the first derivative term in Eq.&nbsp;<A HREF="node6.html#eq:NR-2">23</A>, <!-- MATH
+ $\boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})$
+ -->
+<IMG
+ WIDTH="91" HEIGHT="40" ALIGN="MIDDLE" BORDER="0"
+ SRC="img158.png"
+ ALT="$ \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})$">.
+
+<P>
+The first loop over <code>kprime</code> adds the current contribution to the second derivative matrix, <!-- MATH
+ $\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$
+ -->
+<IMG
+ WIDTH="72" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img150.png"
+ ALT="$ \boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$">, where <!-- MATH
+ $j^\prime=j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img133.png"
+ ALT="$ j^\prime = j$">.  We start this loop at <code>k</code> rather than zero because the <!-- MATH
+ $K+1 \times K+1$
+ -->
+<IMG
+ WIDTH="118" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img91.png"
+ ALT="$ K+1 \times K+1$"> submatrix for the current value of <IMG
+ WIDTH="13" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img117.png"
+ ALT="$ j$"> is symmetric, and once we calculate <code>xtwx_tmp[jj][kk]</code>, we also know <code>xtwx_tmp[kk][jj]</code>.  Finally, a loop for each <!-- MATH
+ $j^\prime \neq j$
+ -->
+<IMG
+ WIDTH="48" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="img142.png"
+ ALT="$ j^\prime \neq j$"> is set up to repeat the loop over <code>kprime</code> using the alternate formulation for <!-- MATH
+ $\boldsymbol{W}$
+ -->
+<IMG
+ WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img88.png"
+ ALT="$ \boldsymbol{W}$"> as noted in Eq.&nbsp;<A HREF="node10.html#eq:multinomial-2nd-deriv-complete">37</A>.
+
+<P>
+The final step in the Newton-Raphson routine is to invert <!-- MATH
+ $\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$
+ -->
+<IMG
+ WIDTH="72" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img150.png"
+ ALT="$ \boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$">, and solve for the next set of elements <!-- MATH
+ $\boldsymbol{\beta}$
+ -->
+<IMG
+ WIDTH="16" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img22.png"
+ ALT="$ \boldsymbol{\beta}$">.  Matrix inversion is a complicated subject constituting a major sub-field of numerical analysis unto itself, and we will not cover the details here.  Since <!-- MATH
+ $\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$
+ -->
+<IMG
+ WIDTH="72" HEIGHT="19" ALIGN="BOTTOM" BORDER="0"
+ SRC="img150.png"
+ ALT="$ \boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}$"> is symmetric and, in most cases, positive definite, the fastest way to invert it is through a Cholesky factorization and backsubstitution. For more information, see [<A
+ HREF="node13.html#golub">7</A>] and [<A
+ HREF="node13.html#press">11</A>].  For now, we will assume that the original matrix, stored in the local variable <code>xtwx_tmp</code>, is still intact, and its inverse has been computed and stored in <code>xtwx</code>.  Note that since <code>xtwx</code> is passed to <code>newton_raphson</code> as a pointer, its newly modified contents will be accessible to the calling routine when this one returns.  <code>xtwx</code> will be needed in the main routine <code>mlelr</code> as part of the test for infinite parameters, as well as any future implementations of significance tests that require the standard errors of the parameter estimates.
+
+<P>
+At last, we have all the information we need to apply Eq.&nbsp;<A HREF="node6.html#eq:NR-2">23</A>.  The direct approach would be to perform the cross multiplication of <code>xtwx</code> and <code>beta_tmp</code> and add the result to the contents of <code>beta</code>, which stores the parameter estimates of the (now previous) iteration.  However, the additive terms are likely to be very small, and as a result the direct approach is highly susceptible to roundoff error.  To maintain precision, we take advantage of the following identity:
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="eq:NR-compute"></A><!-- MATH
+ \begin{eqnarray}
+\boldsymbol{\beta}^{(1)} & = & [\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}]^{-1} \cdot [\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X} \cdot \boldsymbol{\beta}^{(0)} + \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})] \nonumber \\
+& = & \boldsymbol{I} \cdot \boldsymbol{\beta}^{(0)} + [\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}]^{-1} \cdot \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})
+\end{eqnarray}
+ -->
+<TABLE CELLPADDING="0" ALIGN="CENTER" WIDTH="100%">
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="35" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img159.png"
+ ALT="$\displaystyle \boldsymbol{\beta}^{(1)}$"></TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="341" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img160.png"
+ ALT="$\displaystyle [\boldsymbol{X}^T\boldsymbol{W}\boldsymbol{X}]^{-1} \cdot [\bolds...
+...\boldsymbol{\beta}^{(0)} + \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})]$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+&nbsp;</TD></TR>
+<TR VALIGN="MIDDLE"><TD NOWRAP ALIGN="RIGHT">&nbsp;</TD>
+<TD WIDTH="10" ALIGN="CENTER" NOWRAP><IMG
+ WIDTH="18" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.png"
+ ALT="$\displaystyle =$"></TD>
+<TD ALIGN="LEFT" NOWRAP><IMG
+ WIDTH="274" HEIGHT="42" ALIGN="MIDDLE" BORDER="0"
+ SRC="img161.png"
+ ALT="$\displaystyle \boldsymbol{I} \cdot \boldsymbol{\beta}^{(0)} + [\boldsymbol{X}^T...
+...}\boldsymbol{X}]^{-1} \cdot \boldsymbol{X}^T(\boldsymbol{y} - \boldsymbol{\mu})$"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(40)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL">
+
+which is equivalent to Eq.&nbsp;<A HREF="node6.html#eq:NR-2">23</A>.  We will do this in two steps.  First, by computing the second term [bracketed] in the first line of Eq.&nbsp;<A HREF="#eq:NR-compute">40</A>, then by post-multiplying that term with the newly inverted <code>xtwx</code>:
+
+<P>
+<PRE>
+    /* compute xtwx * beta(0) + x(y-mu) */
+    for (i = 0; i &lt; (K + 1) * (J - 1); i++) {
+        tmp1 = 0;
+        for (j = 0; j &lt; (K + 1) * (J - 1); j++) {
+            tmp1 += xtwx_tmp[i][j] * beta[j];
+        }
+        beta_tmp[i] += tmp1;
+    }
+
+    /* solve for new betas */
+    for (i = 0; i &lt; (K + 1) * (J - 1); i++) {
+        tmp1 = 0;
+        for (j = 0; (K + 1) * (J - 1); j++) {
+            tmp1 += xtwx[i][j] * beta_tmp[j];
+        }
+        beta[i] = tmp1;
+    }
+</PRE>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html146"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html144"
+  HREF="mlelr_www.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html138"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html147"
+  HREF="node13.html">Bibliography</A>
+<B> Up:</B> <A NAME="tex2html145"
+  HREF="mlelr_www.html">Maximum Likelihood Estimation of</A>
+<B> Previous:</B> <A NAME="tex2html139"
+  HREF="node11.html">Newton-Raphson</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<br>Scott Czepiel<br><a href="http://czep.net/contact.html">http://czep.net/contact.html</a>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<style type="text/css" media="all">@import url("../main.css");</style>
+<style type="text/css" media="all">
+    table {
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid black;
+    }
+    caption {
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: bold;
+        margin-top: 1em;
+    }
+    tr, th, td {
+        margin: 10px;
+        border: 1px solid black;
+    }
+    th, td {
+        text-align: center;
+    }
+    .cbox2 .e .content {
+        padding: 0 46px 0 30px;
+    }
+    pre {
+        margin: 1em 0 1em 0;
+        padding: 1em;
+        border: 1px solid #555;
+    }
+    
+</style>
+<title>Data Resources</title>
+</head>
+
+<body>
+<div id="one" style="background: #fff;">
+<div id="two">
+
+<h1>Data Resources</h1>
+
+<!-- begin cbox -->
+<div class="cbox2">
+<div class="n"><div><div></div></div></div>
+<div class="w"><div class="e">
+<div class="content">
+
+<h2>Resources in Social Science Data Analysis</h2>
+
+<p>
+This page highlights some tips, techniques, and tools that I have found useful for data analysis of large-scale quantitative surveys that are common in social science research.  Many of the links here will have broad applicability for a wide range of general data analysis and research questions.
+</p>
+
+<h3><a href="ipums_data_prep/">ipums_data_prep.py - A Python script to prepare IPUMS dataset extracts for loading into an RDBMS</a></h3>
+
+<p style="margin-left: 4em;">
+If you do not have access to a statistical package or are otherwise interested in loading datasets downloaded from the <a href="http://www.ipums.org/">IPUMS Project</a>, this script will help prepare the files for loading into a relational database such as <a href="http://www.postgresql.org/">PostgreSQL</a>
+</p>
+
+<h3><a href="graph.html">Graph.py - A Python Graph Library</a></h3>
+
+<p style="margin-left: 4em;">
+Graphs are among the most fundamental and versatile data structures in all of computer science.  Their applicability is so broad that I find myself constantly reinventing the wheel building a graph library from project to project.  In an attempt to consolidate, here is a basic outline of my own implementation of graphs using Python, a language very amenable to high-level data structures and algorithms.  You can view the source above or download the file here as <a href="graph.py.txt">graph.py.txt</a>.
+</p>
+
+<h3><a href="spssread/">spssread.pl - A Perl Script to extract metadata from SPSS data files</a></h3>
+
+<p style="margin-left: 4em;">
+This is a perl script I wrote to extract metadata (aka "dictionary data") from SPSS (sav) files without using the SPSS program itself.  The script can read variable names and labels, as well as all value labels associated with the variables in a data file.
+</p>
+
+<h3><a href="transform.html">Dataset Aggregation and Transposition</a></h3>
+
+<p style="margin-left: 4em;">
+This paper explores some common ways to transform datasets using aggregation, disaggregation, and transposition techniques. The examples here are simplistic, but they represent basic transformation problems that researchers are likely to encounter. Emphasis is on using SAS and SPSS to transform datasets, with some discussion on the benefits and limits to working in an SQL based environment.
+</p>
+
+
+<br />
+</div>
+</div></div>
+<div class="s"><div><div></div></div></div>
+</div>
+<!-- end cbox -->
+
+
+</div><!-- two -->
+</div><!-- one -->
+</body>
+</html>
