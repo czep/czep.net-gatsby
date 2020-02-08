@@ -15,13 +15,13 @@ Like all good recipes, this one will only work if you have the same ingredients 
 
 I haven't used Django since before version 1.0, so I had a lot of catching up to do to bring my dusty memories up to speed.  Whenever I start up with a new framework, I can't really settle down and do any serious coding until I've seen the big picture---I need to get a basic app working in production first or I'll always have this nagging feeling that what I'm doing is completely off track and will never work.  The ease with which Django's development server lets you spin up a basic site running on your local machine is entirely too deceptive.  It's a long road to get from there to a real working deploy and I don't want to travel too far down some path without first verifying that the basic skeleton of the project will actually serve for reals.
 
-I went down this road last year when I was working with [Flask](http://flask.pocoo.org/).  In my [Adventures with Flask](http://czep.net/15/adventures-with-flask.html) post, I discussed [flask-db-test](https://github.com/czep/flask-db-test), a simple yet flexible Flask app that can serve as a foundation for developing larger projects.  The primary purpose was to verify that production database connections were working as expected.  So now I'm going to do the same thing again but this time for Django with the current release version of 1.10.  
+I went down this road last year when I was working with [Flask](http://flask.pocoo.org/).  In my [Adventures with Flask](/15/adventures-with-flask.html) post, I discussed [flask-db-test](https://github.com/czep/flask-db-test), a simple yet flexible Flask app that can serve as a foundation for developing larger projects.  The primary purpose was to verify that production database connections were working as expected.  So now I'm going to do the same thing again but this time for Django with the current release version of 1.10.
 
-Professional Django shops have a wealth of mature tools and processes readily available with well structured development, testing, staging, and production environments that completely automate the pain of manual deployment.  The rest of us have google and a few snippets of commands here and there that we cobble together from past attempts which results in a lot of head-scratching when the damn site just won't work.  Naturally, a lot of this head scratching goes away the second (or twenty-second) time and you then begin to have a decent handle on how to take a clean slate project to production.  
+Professional Django shops have a wealth of mature tools and processes readily available with well structured development, testing, staging, and production environments that completely automate the pain of manual deployment.  The rest of us have google and a few snippets of commands here and there that we cobble together from past attempts which results in a lot of head-scratching when the damn site just won't work.  Naturally, a lot of this head scratching goes away the second (or twenty-second) time and you then begin to have a decent handle on how to take a clean slate project to production.
 
 This is mainly for my own benefit, to codify the failures I've made over the past week and spend the time documenting what I've done so that I can get down to writing some real code and not have to worry about how I'll actually be able to get the site to see the light of day.  However, I hope to also provide some benefit to others, especially surrounding the great mystery of SELinux.  In my research I found a lot of people encountering similar problems as well as a lot of bad advice that I do not wish myself or others to repeat.
 
-In addition to my Adventures with Flask article, this post also builds a great deal on my [Svelte Apache](http://czep.net/16/svelte-apache.html) post.  You don't have to use Apache to deploy Django applications, but the instructions documented here are based primarily for using apache.  Just so we're all on the same page, let me now describe the stack I am using.
+In addition to my Adventures with Flask article, this post also builds a great deal on my [Svelte Apache](/16/svelte-apache.html) post.  You don't have to use Apache to deploy Django applications, but the instructions documented here are based primarily for using apache.  Just so we're all on the same page, let me now describe the stack I am using.
 
 ## The czep django stack
 
@@ -85,7 +85,7 @@ site/config/settings/dev.py
 site/config/settings/prod.py
 ```
 
-A lot of this is window-dressing at this point.  The only critical files you really need to bootstrap a Django project are `manage.py`, `settings.py`, and `urls.py`.  
+A lot of this is window-dressing at this point.  The only critical files you really need to bootstrap a Django project are `manage.py`, `settings.py`, and `urls.py`.
 
 ```bash
 # db setup
@@ -253,7 +253,7 @@ os.environ['DB_PASS'] = 'somepasswordhere'
 
 I struggled with this a bit and am still not 100% convinced it's the best way to do things, but it works and appears relatively safe.  It's an oft-repeated mis-conception that you can't use environment variables with apache.  Sure you can, but the process is slightly different depending on OS packaging.  The solution I adopted here is based on Graham Dumpleton's advice in [this gist about setting environment variables](https://gist.github.com/GrahamDumpleton/b380652b768e81a7f60c).
 
-Also note the slightly unconventional file permissions of 460.  This is because we want apache to be able to read the file, but not write to it.  We also want `webadmin` group members to read and write, but since it contains secrets, we want no read permissions for anyone else.  
+Also note the slightly unconventional file permissions of 460.  This is because we want apache to be able to read the file, but not write to it.  We also want `webadmin` group members to read and write, but since it contains secrets, we want no read permissions for anyone else.
 
 ### Apache configuration
 
@@ -280,16 +280,16 @@ The critical directives you will need to add in order to enable apache to serve 
 
     <Directory /var/www/html/static>
         Require all granted
-    </Directory> 
+    </Directory>
 
 
-Here we are going to mount the app at `/stuff`, rather than the root directory of the web server.  Note very carefully the `WSGIDaemonProcess` directive as you need to specify the correct values for both the `python-home` and `python-path` arguments.  
+Here we are going to mount the app at `/stuff`, rather than the root directory of the web server.  Note very carefully the `WSGIDaemonProcess` directive as you need to specify the correct values for both the `python-home` and `python-path` arguments.
 
 ### SELinux configuration
 
 Lastly, but of paramount importance for the correct and safe operation of your site, you need to do the monkey dance with SELinux.  What you may want to do at this point---and in fact anytime during development when you are troubleshooting strange errors---is to temporarily disable SELinux with `sudo setenforcing 0`.  I agree wholeheartedly that SELinux can be a royal pain in the keester, but I will never recommend to anyone to ever run in production without it.  It is a tough system to learn, and I still barely understand it myself, which is why this part is always more difficult than it should be.  But there are also very good tutorials and tools for troubleshooting SELinux issues.  For instance, `sudo journalctl -n 80` to get a list of the most recent audit logs.  There's also `audit2allow`.
 
-There are 2 problems with the way we've deployed our web application which will cause SELinux to restrict apache from doing what we want it to do.  I'll describe them here and show you how to solve them.  
+There are 2 problems with the way we've deployed our web application which will cause SELinux to restrict apache from doing what we want it to do.  I'll describe them here and show you how to solve them.
 
 After reaching this point, visiting [http://localhost:8080/stuff/](http://localhost:8080/stuff/) in your browser will most certainly result in a 500.  The apache error log will provide a nice vague error message:
 
@@ -335,14 +335,14 @@ There is another potential SELinux configuration problem that is worth mentionin
 
 The first problem is that the source code of our web application does not have a file context that the httpd process is allowed to read.  Your indication that this is happening is that you will see the following AVC denials in the audit log, here formatted for legibility:
 
-    AVC avc:  denied  { getattr } for  pid=3847 comm="httpd" 
-    path="/var/www/apps/stuff/site/config/wsgi.py" 
-    dev="sda1" ino=1705146 
-    scontext=system_u:system_r:httpd_t:s0 
-    tcontext=unconfined_u:object_r:default_t:s0 
+    AVC avc:  denied  { getattr } for  pid=3847 comm="httpd"
+    path="/var/www/apps/stuff/site/config/wsgi.py"
+    dev="sda1" ino=1705146
+    scontext=system_u:system_r:httpd_t:s0
+    tcontext=unconfined_u:object_r:default_t:s0
     tclass=file permissive
 
-This tells us that the httpd process was denied access to the file `/var/www/apps/stuff/site/config/wsgi.py` because it has a file context of `default_t`.  Note that this is *not* a linux permissions problem!  By following this procedure, all the python files in our source tree will have permissions of 664.  They are owned by your user, with group of `webadmin`.  You can also verify that read and execute permissions are set for "other" for all parent directories of the source tree.  Thus, the apache user technically already has read permission to the file.  The solution is *not* to `chmod 777`.  DO NOT DO THIS!  I can't tell you how many Stack Overflow posts I've read along the lines of "Help, I gave apache ownership of the files and it still didn't work!"  "Then I did `chmod 777` and it still didn't work!"  And of course someone comes along and says "just diasble SELinux" and then "wow, thanks, it worked!"  This is a serious :facepalm: moment.  It makes me cringe thinking of how many web apps are out in the wild with world writable permissions on Document Root and SELinux disabled.  
+This tells us that the httpd process was denied access to the file `/var/www/apps/stuff/site/config/wsgi.py` because it has a file context of `default_t`.  Note that this is *not* a linux permissions problem!  By following this procedure, all the python files in our source tree will have permissions of 664.  They are owned by your user, with group of `webadmin`.  You can also verify that read and execute permissions are set for "other" for all parent directories of the source tree.  Thus, the apache user technically already has read permission to the file.  The solution is *not* to `chmod 777`.  DO NOT DO THIS!  I can't tell you how many Stack Overflow posts I've read along the lines of "Help, I gave apache ownership of the files and it still didn't work!"  "Then I did `chmod 777` and it still didn't work!"  And of course someone comes along and says "just diasble SELinux" and then "wow, thanks, it worked!"  This is a serious :facepalm: moment.  It makes me cringe thinking of how many web apps are out in the wild with world writable permissions on Document Root and SELinux disabled.
 
 So it's not a linux permissions problem.  It's also not an apache configuration problem as long as you've given apache `Require all granted` access to the `wsgi.py` file in `httpd.conf`, as illustrated above.  When you see an AVC denial like this, the problem can only be fixed by assigning an appropriate SELinux file context to our source code to allow apache to read it.  The most appropriate file context in my opinion is `httpd_sys_content_t`.  So, let's change the file context for all files under our web application project directory and force a re-label:
 

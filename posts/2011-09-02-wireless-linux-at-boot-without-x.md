@@ -17,7 +17,7 @@ Since most servers require a constant, fast, reliable network connection, it's n
 
 
 
-If for <a href="http://blog.czep.net/2011/08/05/building-a-home-pc-part-1-motivation/">some crazy reason</a> you need a constant, fast, reliable network connection but don't have a convenient Ethernet port nearby, or you simply want to reduce the number of cables strewn about the house, it is still possible to configure a wireless interface without a GUI session.
+If for [some crazy reason](/11/building-a-home-pc-part-1-motivation.html) you need a constant, fast, reliable network connection but don't have a convenient Ethernet port nearby, or you simply want to reduce the number of cables strewn about the house, it is still possible to configure a wireless interface without a GUI session.
 
 
 

@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Building a Home PC - Part 3&#58;  Build Day
-date: 2011-08-12
+title: Building a Home PC - Part 3  Build Day
+date: 2011-08-14
 topics: linux
 ---
 The fun of build day.
@@ -20,23 +20,16 @@ Make a plan, write down the steps.  Think about the order of operations:  inst
 
 
 
-<ol>
+* Try to do it all in one sitting.  Start early so you're not tired and won't have to leave an open chassis with parts hanging out of it overnight.
 
 
 
-	<li>Try to do it all in one sitting.  Start early so you're not tired and won't have to leave an open chassis with parts hanging out of it overnight.</li>
+* Use an anti-static wrist strap.  You may feel like a total dork wearing it, but the truth is that voltages much smaller than you can detect are more than enough to fry the sensitive components for which you have just paid a lot of money.
 
 
 
-	<li>Use an anti-static wrist strap.  You may feel like a total dork wearing it, but the truth is that voltages much smaller than you can detect are more than enough to fry the sensitive components for which you have just paid a lot of money.</li>
+* When you turn it on the first time, expect it not to work.  That way, when it does work you'll be pleasantly surprised!
 
-
-
-	<li>When you turn it on the first time, expect it not to work.  That way, when it does work you'll be pleasantly surprised!</li>
-
-
-
-</ol>
 
 
 
@@ -68,7 +61,7 @@ Here is a view of the first successful power on test, before fully seating the p
 
 
 
-<p style="text-align:left;"><img title="FrankenKomputer" src="http://czep.net/static/img/blog/2011-09-building-a-home-pc-part-3-build-day-1.jpg" alt="" width="640" height="853" />A bit more close-up you can see there won't be much room between the front fan and the end of the power supply once it's in place.<img title="The cables *will* bite" src="http://czep.net/static/img/blog/2011-09-building-a-home-pc-part-3-build-day-2.jpg" alt="" width="640" height="685" /></p>
+<p style="text-align:left;"><img title="FrankenKomputer" src="/img/blog/2011-09-building-a-home-pc-part-3-build-day-1.jpg" alt="" width="40" height="40" />A bit more close-up you can see there won't be much room between the front fan and the end of the power supply once it's in place.<img title="The cables *will* bite" src="/img/blog/2011-09-building-a-home-pc-part-3-build-day-2.jpg" alt="" width="40" height="40" /></p>
 
 
 

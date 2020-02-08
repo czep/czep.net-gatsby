@@ -48,7 +48,7 @@ I had good luck this time, but only after some much needed help from my friends 
 
 
 
-First, <a href="http://blog.czep.net/2011/08/05/building-a-home-pc-part-1-motivation/">my motivation</a>.  Since I built this computer to sit in a corner and periodically handle quite a bit of computation, I want to be able to monitor the temperatures to make sure it can stay cool under heavy load.  lm_sensors is one of the first packages I try to configure before getting into serious work.
+First, [my motivation](/11/building-a-home-pc-part-1-motivation.html).  Since I built this computer to sit in a corner and periodically handle quite a bit of computation, I want to be able to monitor the temperatures to make sure it can stay cool under heavy load.  lm_sensors is one of the first packages I try to configure before getting into serious work.
 
 
 

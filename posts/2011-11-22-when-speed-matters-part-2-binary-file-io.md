@@ -1,6 +1,6 @@
 ---
 layout: post
-title: When Speed Matters Part 2&#58;  Binary File I/O
+title: When Speed Matters Part 2  Binary File I/O
 date: 2011-11-22
 author: czep
 topics: data
@@ -9,31 +9,25 @@ A look at the kernel internals for handling file I/O operations.
 
 <!--excerpt-->
 
-In <a href="http://blog.czep.net/2011/11/03/when-speed-matters-high-speed-analysis-of-large-datasets-in-real-time/">Part 1</a>, we introduce some of the initial design considerations impacting a system for high-speed analysis of large datasets.  In particular we're interested in this type of scenario:
+In [Part 1](/11/when-speed-matters-high-speed-analysis-of-large-datasets-in-real-time.html), we introduce some of the initial design considerations impacting a system for high-speed analysis of large datasets.  In particular we're interested in this type of scenario:
 
 
 
-<ul>
+* the user expects response times no longer than 7 seconds
 
 
 
-	<li>the user expects response times no longer than 7 seconds</li>
+* the data is too large to fit in main memory, or doing so would be too costly (no memcached)
 
 
 
-	<li>the data is too large to fit in main memory, or doing so would be too costly (no memcached)</li>
+* the analysis cannot be entirely pre-computed (no OLAP)
 
 
 
-	<li>the analysis cannot be entirely pre-computed (no OLAP)</li>
+* an RDBMS or statistical package is not able to meet the expected response times
 
 
-
-	<li>an RDBMS or statistical package is not able to meet the expected response times</li>
-
-
-
-</ul>
 
 
 

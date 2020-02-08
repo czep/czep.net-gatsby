@@ -44,31 +44,25 @@ My definition of analytics is:
 
 
 
-<blockquote>The practice of using data to build models that explain, optimize, or predict some event in order to provide a business advantage.</blockquote>
+    The practice of using data to build models that explain,
+    optimize, or predict some event in order to provide
+    a business advantage.
 
 
 
 I find this to be a very compact definition that still incorporates the most essential aspects of what analytics means.  There are three very important pieces to my definition.
 
 
-
-<ol>
-
-
-
-	<li><strong>Analytics is the practice of using data.</strong> Note that word 'practice'.  This implies some planning and design of an infrastructure to organize and process the data.  Most data warehouses are built to specs written by finance teams to serve reporting needs.  Analytics requires its own infrastructure in order to generate an efficient data pipeline for analysis.  Don't hire a team of Stats PhDs and expect them to crank out the next great recommendations engine with their Dell laptops.</li>
+* **Analytics is the practice of using data.** Note that word 'practice'.  This implies some planning and design of an infrastructure to organize and process the data.  Most data warehouses are built to specs written by finance teams to serve reporting needs.  Analytics requires its own infrastructure in order to generate an efficient data pipeline for analysis.  Don't hire a team of Stats PhDs and expect them to crank out the next great recommendations engine with their Dell laptops.
 
 
 
-	<li><strong>The purpose of analytics is to provide a business advantage.</strong> I did not include this simply to get props from the business folks in the audience.  Far too often the business problem gets buried behind implementation details, or is de-prioritized by a "sexier" problem that the analysts want to work on.  Let's be clear:  analytics is not about building cool stuff.  It's about building cool stuff that solves an important business problem or need.  Anything else is a waste of time and money, and will ultimately lead the business to question the value of analytics.</li>
+* **The purpose of analytics is to provide a business advantage.** I did not include this simply to get props from the business folks in the audience.  Far too often the business problem gets buried behind implementation details, or is de-prioritized by a "sexier" problem that the analysts want to work on.  Let's be clear:  analytics is not about building cool stuff.  It's about building cool stuff that solves an important business problem or need.  Anything else is a waste of time and money, and will ultimately lead the business to question the value of analytics.
 
 
 
-	<li><strong>Analytics involves building models.</strong> What separates analytics from traditional old-school product development is the use of data—rather than human intuition—to guide decision-making.  Anytime you have a dataset that is used to explain existing patterns or predict future behavior, this involves building some kind of model from the dataset to reality.  This clarifies that analytics needs clearly defined deliverables without which there would be no way to measure success and iterate.</li>
+* **Analytics involves building models.** What separates analytics from traditional old-school product development is the use of data—rather than human intuition—to guide decision-making.  Anytime you have a dataset that is used to explain existing patterns or predict future behavior, this involves building some kind of model from the dataset to reality.  This clarifies that analytics needs clearly defined deliverables without which there would be no way to measure success and iterate.
 
-
-
-</ol>
 
 
 

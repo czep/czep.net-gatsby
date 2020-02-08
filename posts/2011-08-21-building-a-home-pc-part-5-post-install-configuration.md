@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Building a Home PC - Part 5&#58;  Post-install Configuration
+title: Building a Home PC - Part 5  Post-install Configuration
 date: 2011-08-21
 topics: linux
 ---
@@ -28,7 +28,7 @@ What follows is my own post-install checklist which you should certainly supplem
 
 
 
-* **wifi**.  Since I'm not using a LAN cable, I need to configure a wireless interface to work at startup.  In another post I talk about [configuring wpa_supplicant]({% post_url 2011-09-02-wireless-linux-at-boot-without-x %}) for this purpose.
+* **wifi**.  Since I'm not using a LAN cable, I need to configure a wireless interface to work at startup.  In another post I talk about [configuring wpa_supplicant](/11/wireless-linux-at-boot-without-x.html) for this purpose.
 
 
 
@@ -40,7 +40,7 @@ What follows is my own post-install checklist which you should certainly supplem
 
 
 
-* **lm-sensors**.  This library and associated client software allows you to read useful data from your motherboard including temperatures, fan speeds, and voltages, that you can monitor to ensure your computer stays in good health.  I almost never get this working out of the box, and in another post I describe the steps on the road to [getting lm_sensors to work]({% post_url 2011-09-17-getting-lm_sensors-to-work %}) with my chips.
+* **lm-sensors**.  This library and associated client software allows you to read useful data from your motherboard including temperatures, fan speeds, and voltages, that you can monitor to ensure your computer stays in good health.  I almost never get this working out of the box, and in another post I describe the steps on the road to [getting lm_sensors to work](/11/getting-lm_sensors-to-work.html) with my chips.
 
 
 

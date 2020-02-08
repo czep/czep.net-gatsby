@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Building a Home PC - Part 4&#58;  Linux Installation
+title: Building a Home PC - Part 4  Linux Installation
 date: 2011-08-16
 topics: linux
 ---
@@ -8,9 +8,9 @@ Fun with the favorite OS.
 
 <!--excerpt-->
 
-As chronicled in the [first]({% post_url 2011-08-06-building-a-home-pc-part-1-motivation %})
-[three]({% post_url 2011-08-12-building-a-home-pc-part-2-hardware %})
-[parts]({% post_url 2011-08-12-building-a-home-pc-part-3-build-day %})
+As chronicled in the [first](/11/building-a-home-pc-part-1-motivation.html)
+[three](/11/building-a-home-pc-part-2-hardware.html)
+[parts](/11/building-a-home-pc-part-3-build-day.html)
  of this series, I have just finished building a new computer and now I am going to install linux and get down to work.
 
 
@@ -18,7 +18,7 @@ As chronicled in the [first]({% post_url 2011-08-06-building-a-home-pc-part-1-mo
 
 
 
-I wrote <a href="http://czep.net/weblog/linux.html">this essay about linux</a> a long time ago and my feelings haven't changed much over the years.  Linux remains one of the most disruptive technologies of our time and it is unfathomable to think of any facet of today's internet, the state of software development, or scientific computing if we didn't have the linux operating system and the GNU toolset that form the bedrock of the open source software stack.  Linux recently turned 20 years old.  It's unix roots date back more than 40 years.  Yet, far from being out of date, linux is everywhere today, from mobile phones to data centers, investment banks to web startups.  Linus's mission of world domination has in fact already come true.
+I wrote <a href="https://czep.net/weblog/linux.html">this essay about linux</a> a long time ago and my feelings haven't changed much over the years.  Linux remains one of the most disruptive technologies of our time and it is unfathomable to think of any facet of today's internet, the state of software development, or scientific computing if we didn't have the linux operating system and the GNU toolset that form the bedrock of the open source software stack.  Linux recently turned 20 years old.  It's unix roots date back more than 40 years.  Yet, far from being out of date, linux is everywhere today, from mobile phones to data centers, investment banks to web startups.  Linus's mission of world domination has in fact already come true.
 
 
 

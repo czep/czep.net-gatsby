@@ -9,6 +9,7 @@ const BlogPost = (props) => {
   const post = props.data.markdownRemark;
   const siteTitle = props.data.site.siteMetadata.title;
   const { previous, next } = props.pageContext;
+  const postContent = post.html.split("<!--excerpt-->")[1];
 
   return (
     <Layout location={props.location} title={siteTitle}>
@@ -26,7 +27,7 @@ const BlogPost = (props) => {
             <span className="meta-item">{post.frontmatter.date}</span>
           </p>
         </header>
-        <section dangerouslySetInnerHTML={{ __html: post.html }} />
+        <section dangerouslySetInnerHTML={{ __html: postContent }} />
         <hr />
         <footer>
           <Bio />

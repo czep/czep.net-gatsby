@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Building a Home PC - Part 1&#58;  Motivation
+title: Building a Home PC - Part 1 Motivation
 date: 2011-08-06
 topics: linux
 ---

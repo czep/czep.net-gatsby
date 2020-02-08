@@ -1,14 +1,14 @@
 ---
 layout: post
-title: Building a Home PC - Part 2&#58;  Hardware
+title: Building a Home PC - Part 2 Hardware
 date: 2011-08-12
 topics: linux
 ---
-In [Part 1]({% post_url 2011-08-06-building-a-home-pc-part-1-motivation %}), I explained my motivation for deciding to build a new PC for use at home.  In this post, I will be a little more specific about what type of PC I am looking for, and the methods behind my hardware selection process.
+In [Part 1](/11/building-a-home-pc-part-1-motivation.html), I explained my motivation for deciding to build a new PC for use at home.  In this post, I will be a little more specific about what type of PC I am looking for, and the methods behind my hardware selection process.
 
 <!--excerpt-->
 
-In [Part 1]({% post_url 2011-08-06-building-a-home-pc-part-1-motivation %}), I explained my motivation for deciding to build a new PC for use at home.  In this post, I will be a little more specific about what type of PC I am looking for, and the methods behind my hardware selection process.
+In [Part 1](/11/building-a-home-pc-part-1-motivation.html), I explained my motivation for deciding to build a new PC for use at home.  In this post, I will be a little more specific about what type of PC I am looking for, and the methods behind my hardware selection process.
 
 
 

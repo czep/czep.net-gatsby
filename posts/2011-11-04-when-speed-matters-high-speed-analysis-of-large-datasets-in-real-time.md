@@ -1,6 +1,6 @@
 ---
 layout: post
-title: When Speed Matters&#58;  High-Speed Analysis of Large Datasets in Real Time
+title: When Speed Matters High-Speed Analysis of Large Datasets in Real Time
 date: 2011-11-04
 topics: data
 ---
