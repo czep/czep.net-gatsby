@@ -99,7 +99,7 @@ export const listQuery = graphql`
           frontmatter {
             layout
             path
-            date(formatString: "D MMM YYYY")
+            date(formatString: "DD MMM YYYY")
             title
             topics
           }

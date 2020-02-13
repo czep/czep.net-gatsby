@@ -10,6 +10,8 @@ const BlogPost = (props) => {
   const siteTitle = props.data.site.siteMetadata.title;
   const { previous, next } = props.pageContext;
   const postContent = post.html.split("<!--excerpt-->")[1];
+  const topics = post.frontmatter.topics.split(" ");
+  const wc = Number.parseFloat(Number.parseInt(post.wordCount.words) / 1000.0).toFixed(1).toString() + 'k';
 
   return (
     <Layout location={props.location} title={siteTitle}>
@@ -25,6 +27,21 @@ const BlogPost = (props) => {
           </h1>
           <p className="post-meta">
             <span className="meta-item">{post.frontmatter.date}</span>
+            ⋄
+            <a className="post-author" href="/about/">czep</a>
+            ⋄
+            <span className="category">
+              {topics.map((topic, i) => {
+                return (
+                  <span key="{topic}">
+                  <Link to={`/topics/${topic}/`}>{topic}</Link>
+                  {i !== topics.length - 1 ? '⋄' : ''}
+                  </span>
+                )
+              })}
+            </span>
+            ⋄
+            <span className="meta-item">{wc} words / {post.timeToRead} minutes</span>
           </p>
         </header>
         <section dangerouslySetInnerHTML={{ __html: postContent }} />
@@ -73,8 +90,13 @@ export const blogPostQuery = graphql`
       html
       frontmatter {
         title
-        date(formatString: "D MMM YYYY")
+        date(formatString: "DD MMM YYYY")
+        topics
       }
+      wordCount {
+        words
+      }
+      timeToRead
     }
   }
 `;

@@ -76,5 +76,19 @@ module.exports = {
       },
     },
     `gatsby-plugin-react-helmet`,
+    {
+      resolve: `gatsby-plugin-s3`,
+      options: {
+        bucketName: "czep.net",
+        protocol: "https",
+        hostname: "czep.net",
+      },
+    },
+    {
+      resolve: `gatsby-plugin-canonical-urls`,
+      options: {
+        siteUrl: "https://czep.net",
+      }
+    }
   ],
 }
