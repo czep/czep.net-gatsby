@@ -46,6 +46,7 @@ const Sidebar = (props) => {
             <li><a href="/">Home</a></li>
             <li><a href="/about/">About</a></li>
             <li><a href="/degauss.html">Much Earlier</a></li>
+            <li><a href="/feed.xml">RSS feed</a></li>
           </ul>
       </div>
       <div id="topic_list">

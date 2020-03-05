@@ -126,8 +126,9 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
     if (node.frontmatter.layout === 'post') {
 
       const [, postDate, postSlug] = filename.match(
-        /^\/([\d]{4}-[\d]{2}-[\d]{2})-{1}(.+)\/$/
+        /^\/(?:drafts\/)?([\d]{4}-[\d]{2}-[\d]{2})-{1}(.+)\/$/
       );
+
       const postYear = postDate.substring(2, 4);
       const slug = `/${postYear}/${postSlug}.html`;
 
