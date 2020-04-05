@@ -451,7 +451,7 @@ select * from n_events_at_or_above_score order by 1, 2
 (7 rows)
 ```
 
-Why do we only get 2 cities at or above a score of 1 when we know there are 5?  The answer is that there are gaps in our scores.  New York has two events with a score of 2, but none with a score of 1.  When we aggregate by both city and score, there are no rows to represent the combination of New York at score 1.  Thus, when we group by score to count the number of cities at or above that score with ```sql count(case when n_events_at_or_above_score > 0 then 1 else null end)```, the fact that New York has events at a score of 2 is not available for the combination of `city = 'New York'` and `score = 1`.
+Why do we only get 2 cities at or above a score of 1 when we know there are 5?  The answer is that there are gaps in our scores.  New York has two events with a score of 2, but none with a score of 1.  When we aggregate by both city and score, there are no rows to represent the combination of New York at score 1.  Thus, when we group by score to count the number of cities at or above that score with `sql|count(case when n_events_at_or_above_score > 0 then 1 else null end)`, the fact that New York has events at a score of 2 is not available for the combination of `city = 'New York'` and `score = 1`.
 
 To fill in the gaps, we can go back to what we used earlier by constructing a template with all the rows we want to see in the output, selecting from that template and left joining to our grouped events.
 
